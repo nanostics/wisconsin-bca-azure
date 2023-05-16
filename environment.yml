@@ -13,6 +13,6 @@ dependencies:
   - ipykernel
   - flask>=2.0.0
   - pip:
-    - numpy
-    - mlflow
-    - azureml-core
+      - numpy
+      - mlflow
+      - azureml-core
