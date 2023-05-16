@@ -13,9 +13,6 @@ dependencies:
   - ipykernel
   - flask>=2.0.0
   - pip:
-      - numpy
-      - azureml-mlflow
-      - mlflow
-      - azureml-sdk
-      - azureml-widgets
-      - azure-ai-ml
+    - numpy
+    - mlflow
+    - azureml-core
