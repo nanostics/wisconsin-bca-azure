@@ -2,17 +2,10 @@ name: base
 channels:
   - defaults
 dependencies:
-  - pandas
-  - seaborn
-  - matplotlib
-  - scikit-learn
-  - scipy=1.9.1
-  - python=3.9.13
-  - pip=22.2.2
   - tqdm
-  - ipykernel
-  - flask>=2.0.0
   - pip:
       - numpy
       - mlflow
-      - azureml-core
+      - azure-ai-ml
+      - mlflow[extras]
+      - inference-schema
