@@ -1,2 +1,2 @@
 mlruns
-config.json
+config*.json
