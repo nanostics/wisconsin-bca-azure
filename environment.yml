@@ -2,7 +2,8 @@ name: base
 channels:
   - defaults
 dependencies:
-  - tqdm
+  - python=3.9.13
+  - pip
   - pip:
       - numpy
       - mlflow
