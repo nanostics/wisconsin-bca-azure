@@ -1,23 +1,22 @@
 # This Python script handles the model execution inside the service container. The init() method loads the model file, and run(data) is called for every input to the service.
 
-import joblib
-import json
-import numpy as np
 import os
+import joblib
+import numpy as np
 
 from inference_schema.schema_decorators import input_schema, output_schema
 from inference_schema.parameter_types.numpy_parameter_type import NumpyParameterType
 
 
 def init():
-    global model
+    global MODEL
     # AZUREML_MODEL_DIR is an environment variable created during deployment.
     # It is the path to the model folder (./azureml-models/$MODEL_NAME/$VERSION)
     # For multiple models, it points to the folder containing all deployed models (./azureml-models)
     model_path = os.path.join(
         os.getenv('AZUREML_MODEL_DIR'), 'model.pkl')
     # Deserialize the model file back into a sklearn model.
-    model = joblib.load(model_path)
+    MODEL = joblib.load(model_path)
 
 '''
 SAMPLE JSON:
@@ -64,7 +63,7 @@ output_sample = np.array([1])
 @output_schema(NumpyParameterType(output_sample))
 def run(data):
     try:
-        result = model.predict(data)
+        result = MODEL.predict(data)
         # You can return any JSON-serializable object.
         return result.tolist()
     except Exception as e:
