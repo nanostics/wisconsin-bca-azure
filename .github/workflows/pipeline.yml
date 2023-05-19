@@ -51,6 +51,11 @@ jobs:
           update-conda: true
           python-version: 3.9
       
+      - name: Test Conda Installation
+        run: |
+          conda --version
+          which python
+      
       - name: Install environment.yml
         run: conda env update -n base -f environment.yml
 
