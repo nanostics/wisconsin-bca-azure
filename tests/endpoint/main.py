@@ -1,4 +1,5 @@
 import os
+import json
 
 from azureml.core.webservice import LocalWebservice
 from azureml.core.authentication import AzureCliAuthentication
@@ -27,7 +28,7 @@ def get_workspace() -> Workspace:
     '''
     Returns a workspace object from the environment variables. 
     
-    Authenticates from the Azure CLI 
+    Authenticates from the Azure CLI
     
     Prerequisites:
     - installed azure-cli package
@@ -70,7 +71,7 @@ if __name__ == '__main__':
     local_env = create_local_env()
     inference_config = InferenceConfig(entry_script="score.py", environment=local_env)
 
-    deployment_config = LocalWebservice.deploy_configuration(port=6789)
+    deployment_config = LocalWebservice.deploy_configuration(port=6969)
 
     local_service = Model.deploy(
         workspace=ws,
@@ -81,3 +82,27 @@ if __name__ == '__main__':
 
     local_service.wait_for_deployment(show_output=True)
     print(f"Scoring URI is : {local_service.scoring_uri}")
+
+    # Hardcoded data to pass to the service
+    # https://github.com/Azure/MachineLearningNotebooks/blob/master/how-to-use-azureml/deployment/deploy-to-local/register-model-deploy-local.ipynb
+    # "Test Web Service" section
+    sample_data = [[ 1.06440132,  0.80405382,  1.4890773 ,  1.82441732,  2.12011885,
+         1.62621261,  1.67428659,  2.99057306,  1.00350134,  3.10485027,
+         2.83317058,  0.33334666,  1.20575539,  1.43235646,  1.31676276,
+         0.79819672,  0.75820626,  0.60151745,  1.59568557,  1.56051245,
+         0.06110285,  0.51173261,  1.04502958,  1.17239422,  0.59875684,
+         0.57992707],
+       [-0.5717181 , -2.31970186, -1.47899644, -1.05175858, -1.15248909,
+        -1.15452931, -1.25625737, -1.1784716 , -0.91527307, -1.19667305,
+        -0.85104217, -1.23083649, -1.21640805, -0.8682195 , -1.4359442 ,
+        -0.62149239, -0.87326335, -0.82629925, -0.40398055, -0.36784753,
+        -2.1137895 , -1.29354244, -1.13316074, -1.28738793, -0.75765468,
+        -1.24889433]]
+
+    sample_input = json.dumps({
+        'data': sample_data.tolist()
+    })
+    res = local_service.run(sample_input)
+    print(f"Result: {res}")
+
+    local_service.delete()
