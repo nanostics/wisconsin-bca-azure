@@ -31,7 +31,8 @@ jobs:
           conda env list
       
       - name: Install environment.yml
-        run: conda env update -n base -f environment.yml
+        # https://stackoverflow.com/a/43873901
+        run: conda env update -n __setup_conda -f environment.yml --prune
 
       - name: Run Endpoint Test
         run: |
