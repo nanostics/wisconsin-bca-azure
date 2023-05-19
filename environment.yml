@@ -13,3 +13,5 @@ dependencies:
       - azure-ai-ml
       - mlflow[extras]
       - inference-schema
+      - azureml-inference-server-http # needed to run local endpoint
+      - azure-cli
