@@ -27,3 +27,27 @@ jobs:
       job-name: test
     secrets:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+  test-endpoint:
+    name: Test Endpoint
+    needs: azure-pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      
+      - name: Install az ml extension
+        run: az extension add -n ml -y
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Run Endpoint Test
+        run: |
+          cd tests/endpoint && python main.py
+        env:
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          WORKSPACE_NAME: ${{ vars.AZURE_WORKSPACE_NAME }}
