@@ -1,4 +1,5 @@
 # COPY OF deploy-local/score.py
+# TODO: consolidate the files
 
 import os
 import joblib

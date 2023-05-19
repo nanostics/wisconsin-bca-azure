@@ -11,6 +11,7 @@ on:
       - .github/workflows/pipeline.yml # this file
       - azure/train/pipeline.yml # azureml pipeline file
       - develop/*.py # python files responsible for running the pipeline
+      - tests/endpoint/*.py # Python files responsible for testing the endpoint
 
 
 jobs:
