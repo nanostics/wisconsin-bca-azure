@@ -39,3 +39,6 @@ jobs:
         run: |
           az ml environment create --file azure/azure-env.yml \
             --tags "sha=${{ github.sha }}"
+
+  run-pipeline:
+    uses: ./.github/workflows/pipeline.yml
