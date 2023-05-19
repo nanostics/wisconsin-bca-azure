@@ -7,6 +7,9 @@ from azureml.core.environment import Environment
 from azureml.core import Workspace
 from azureml.core.model import Model
 
+import sklearn
+
+
 def get_envs() -> tuple[str, str, str]:
     '''
     Looks in the environment for the following variables:
@@ -45,12 +48,27 @@ def get_workspace() -> Workspace:
 
     return ws
 
+def create_local_env() -> Environment:
+    '''
+    I think this creates an environment but doesn't upload it anywhere (which we want)
+
+    https://github.com/Azure/MachineLearningNotebooks/blob/master/how-to-use-azureml/deployment/deploy-to-local/register-model-deploy-local.ipynb
+
+    Note these packages are only for the score.py
+    '''
+    environment = Environment("LocalDeploy")
+    environment.python.conda_dependencies.add_pip_package("inference-schema[numpy-support]")
+    environment.python.conda_dependencies.add_pip_package("joblib")
+    environment.python.conda_dependencies.add_pip_package(f"scikit-learn=={sklearn.__version__}")
+
+    return environment
+
 if __name__ == '__main__':
     ws = get_workspace()
 
     model = Model(ws, 'wisconsin-BCa-model')
-    myenv = Environment.get(workspace=ws, name="wisconsin-bca-env")
-    inference_config = InferenceConfig(entry_script="score.py", environment=myenv)
+    local_env = create_local_env()
+    inference_config = InferenceConfig(entry_script="score.py", environment=local_env)
 
     deployment_config = LocalWebservice.deploy_configuration(port=6789)
 
