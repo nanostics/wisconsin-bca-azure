@@ -9,7 +9,7 @@ dependencies:
   - pip
   - pip:
       - numpy
-      - mlflow
+      - azureml-mlflow
       - azure-ai-ml
       - mlflow[extras]
       - inference-schema
