@@ -19,32 +19,39 @@ import mlflow.sklearn
 import mlflow.pyfunc
 from mlflow.tracking import MlflowClient
 
-TARGET_COL = "cost"
+
+TARGET_COL = "diagnosis_01"
 
 NUMERIC_COLS = [
-    "distance",
-    "dropoff_latitude",
-    "dropoff_longitude",
-    "passengers",
-    "pickup_latitude",
-    "pickup_longitude",
-    "pickup_weekday",
-    "pickup_month",
-    "pickup_monthday",
-    "pickup_hour",
-    "pickup_minute",
-    "pickup_second",
-    "dropoff_weekday",
-    "dropoff_month",
-    "dropoff_monthday",
-    "dropoff_hour",
-    "dropoff_minute",
-    "dropoff_second",
+    'texture_mean',
+    'smoothness_mean',
+    'compactness_mean',
+    'concavity_mean',
+    'concave points_mean',
+    'symmetry_mean',
+    'fractal_dimension_mean',
+    'radius_se',
+    'texture_se',
+    'perimeter_se',
+    'area_se',
+    'smoothness_se',
+    'compactness_se',
+    'concavity_se',
+    'concave points_se',
+    'symmetry_se',
+    'fractal_dimension_se',
+    'texture_worst',
+    'perimeter_worst',
+    'area_worst',
+    'smoothness_worst',
+    'compactness_worst',
+    'concavity_worst',
+    'concave points_worst',
+    'symmetry_worst',
+    'fractal_dimension_worst'
 ]
 
 CAT_NOM_COLS = [
-    "store_forward",
-    "vendor",
 ]
 
 CAT_ORD_COLS = [
@@ -60,9 +67,7 @@ def parse_args():
     parser.add_argument("--evaluation_output", type=str, help="Path of eval results")
     parser.add_argument("--runner", type=str, help="Local or Cloud Runner", default="CloudRunner")
 
-    args = parser.parse_args()
-
-    return args
+    return parser.parse_args()
 
 def main(args):
     '''Read trained model and test dataset, evaluate model and save result'''
@@ -185,7 +190,7 @@ if __name__ == "__main__":
 
     for line in lines:
         print(line)
-    
+
     main(args)
 
     mlflow.end_run()
