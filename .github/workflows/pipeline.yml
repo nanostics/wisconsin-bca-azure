@@ -4,6 +4,13 @@ name: Train Evaluate Register
 on: 
   workflow_dispatch:
   workflow_call:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/pipeline.yml # this file
+      - azure/train/pipeline.yml # azureml pipeline file
+      - develop/*.py # python files responsible for running the pipeline
 
 
 jobs:

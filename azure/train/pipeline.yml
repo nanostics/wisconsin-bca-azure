@@ -9,6 +9,7 @@ inputs:
     type: uri_file
     path: azureml:wisconsin-bca-data@latest #in parquet file
 
+# I think azure automagically fills in these values for the outputs
 outputs: 
   train_data:
   val_data:
