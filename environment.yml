@@ -1,4 +1,7 @@
 name: base
+
+# this conda environment.yml file is just for us to locally develop our project
+# it should be a superset of the conda environment we train and deploy with!
 channels:
   - defaults
 dependencies:

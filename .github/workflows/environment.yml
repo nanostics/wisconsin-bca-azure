@@ -1,0 +1,40 @@
+name: Upload New Environment
+
+
+on: 
+  workflow_dispatch:
+  workflow_call:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/environment.yml # this file
+      - environment.yml # actual conda environment file
+      - azure/azure-env.yml # azureml environment file
+
+
+jobs:
+  # this runs train-evaluate-register stuff on the Azure compute instances.
+  update-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      
+      - name: Install az ml extension
+        run: az extension add -n ml -y
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set Workspace and RG Defaults
+        run: |
+          az configure --defaults workspace=${{ vars.AZURE_WORKSPACE_NAME }}
+          az configure --defaults group=${{ vars.AZURE_RESOURCE_GROUP }}
+
+      # version automatically updates if I run this multiple times
+      - name: Upload new Environment
+        run: |
+          az ml environment create --file azure/azure-env.yml
