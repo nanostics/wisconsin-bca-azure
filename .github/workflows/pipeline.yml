@@ -21,8 +21,8 @@ jobs:
     # https://github.com/Azure/mlops-templates/blob/main/.github/workflows/run-pipeline.yml
     uses: Azure/mlops-templates/.github/workflows/run-pipeline.yml@main
     with:
-      resource_group: ${{ vars.AZURE_WORKSPACE_NAME }}
-      workspace_name: ${{ vars.AZURE_RESOURCE_GROUP }}
+      workspace_name: ${{ vars.AZURE_WORKSPACE_NAME }}
+      resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
       parameters-file:  azure/train/pipeline.yml
       job-name: test
     secrets:
