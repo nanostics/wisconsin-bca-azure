@@ -1,6 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
 name: wisconsin-bca-env
-image: mcr.microsoft.com/azureml/sklearn-1.0-ubuntu20.04-py38-cpu:latest
+image: mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest
 # this is relative to this file
 conda_file: ../environment.yml 
 description: Environment for training a model on the Wisconsin BCa dataset
