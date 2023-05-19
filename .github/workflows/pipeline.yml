@@ -44,6 +44,15 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Setup conda
+        uses: s-weigand/setup-conda@v1
+        with:
+          update-conda: true
+          python-version: 3.9
+      
+      - name: Install environment.yml
+        run: conda env update -n base -f environment.yml
 
       - name: Run Endpoint Test
         run: |
