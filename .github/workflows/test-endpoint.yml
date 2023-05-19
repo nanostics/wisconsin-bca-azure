@@ -28,6 +28,7 @@ jobs:
         run: |
           conda --version
           which python
+          conda env list
       
       - name: Install environment.yml
         run: conda env update -n base -f environment.yml
