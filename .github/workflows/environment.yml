@@ -37,4 +37,5 @@ jobs:
       # version automatically updates if I run this multiple times
       - name: Upload new Environment
         run: |
-          az ml environment create --file azure/azure-env.yml
+          az ml environment create --file azure/azure-env.yml \
+            --tags "sha=${{ github.sha }}"
