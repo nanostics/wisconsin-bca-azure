@@ -68,6 +68,8 @@ if __name__ == '__main__':
     ws = get_workspace()
 
     model = Model(ws, 'wisconsin-BCa-model')
+    print(f'Model {model.name} version {model.version} loaded from {model.workspace.name} into path {model.get_model_path(model.name, _workspace=ws)}')
+    print(os.listdir(model.get_model_path(model.name, _workspace=ws)))
     local_env = create_local_env()
     inference_config = InferenceConfig(entry_script="score.py", environment=local_env)
 
@@ -100,7 +102,7 @@ if __name__ == '__main__':
         -1.24889433]]
 
     sample_input = json.dumps({
-        'data': sample_data.tolist()
+        'data': sample_data
     })
     res = local_service.run(sample_input)
     print(f"Result: {res}")

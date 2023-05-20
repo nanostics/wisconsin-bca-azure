@@ -15,7 +15,7 @@ def init():
     # It is the path to the model folder (./azureml-models/$MODEL_NAME/$VERSION)
     # For multiple models, it points to the folder containing all deployed models (./azureml-models)
     model_path = os.path.join(
-        os.getenv('AZUREML_MODEL_DIR'), 'model.pkl')
+        os.getenv('AZUREML_MODEL_DIR'), 'wisconsin-BCa-model/model.pkl')
     # Deserialize the model file back into a sklearn model.
     MODEL = joblib.load(model_path)
 
