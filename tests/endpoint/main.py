@@ -6,7 +6,9 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
     ManagedOnlineEndpoint,
     ManagedOnlineDeployment,
-    Model
+    Model,
+    Environment,
+    CodeConfiguration,
 )
 from azure.identity import AzureCliCredential
 
@@ -49,6 +51,7 @@ def get_mlclient() -> MLClient:
 
     return ml_client
 
+
 def get_latest_model(mlclient: MLClient) -> Model:
     '''
     Returns the latest model (wisconsin-bca-model) from the workspace
@@ -64,6 +67,18 @@ def get_latest_model(mlclient: MLClient) -> Model:
 
     mlclient.models.download(MODEL_NAME, latest_model_version, download_path='.azure-tmp')
     return Model(path='.')
+
+
+def create_ml_environment() -> Environment:
+    # assume the python file is being run in the root of the repo
+    env = Environment(
+        name='local',
+        conda_file='azure/azure-env.yml',
+        image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
+    )
+    print(f'Environment made {env.name}')
+    return env
+
 
 def create_or_update_endpoint(mlclient: MLClient) -> ManagedOnlineEndpoint:
     '''
@@ -86,7 +101,14 @@ def create_or_update_endpoint(mlclient: MLClient) -> ManagedOnlineEndpoint:
 
         return endpoint
 
-def create_or_update_deployment(mlclient: MLClient, model: Model, endpoint: ManagedOnlineEndpoint, local: bool = True) -> tuple[str, str]:
+
+def create_or_update_deployment(
+        mlclient: MLClient, 
+        model: Model, 
+        endpoint: ManagedOnlineEndpoint, 
+        environment: Environment, 
+        local: bool = True
+    ) -> tuple[str, str]:
     '''
     Creates model deployment if it doesn't exist, else updates it
 
@@ -94,41 +116,30 @@ def create_or_update_deployment(mlclient: MLClient, model: Model, endpoint: Mana
     https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html
     In theory, this should reduce downtime. If the deployment fails, the traffic is still routed to the old deployment.
     '''
-    # check the current traffic distribution
-    print(f'Current traffic: {endpoint.traffic}')
-    if 'blue' in endpoint.traffic and endpoint.traffic['blue'] == 100:
-        deployment_name, instance_type = 'green', "Standard_F4s_v2"
-    else:
-        deployment_name, instance_type = 'blue', "Standard_DS3_v2"
-
     # define an online deployment
     deployment = ManagedOnlineDeployment(
-        name=deployment_name,
+        name='local',
         endpoint_name=endpoint.name,
         model=model,
+        environment=environment,
         # Compute instance list:
         # https://learn.microsoft.com/en-us/azure/machine-learning/reference-managed-online-endpoints-vm-sku-list?view=azureml-api-2
-        instance_type=instance_type,
+        instance_type='Standard_DS3_v2',
         instance_count=1
     )
     print(f'Initialized deployment {deployment.name}')
     deployment_result = mlclient.online_deployments.begin_create_or_update(
-        deployment, local=local
+        deployment, local=True
     ).result()
     print(f'Created deployment {deployment_result.name}')
-
-    if not local:
-        endpoint.traffic = {deployment_name: 100}
-        mlclient.online_endpoints.begin_create_or_update(endpoint).result()
-    
-    return deployment_name, instance_type
 
 
 if __name__ == '__main__':
     mlclient = get_mlclient()
     model = get_latest_model(mlclient)
+    environment = create_ml_environment()
     endpoint = create_or_update_endpoint(mlclient)
-    deployment_name, instance_type = create_or_update_deployment(mlclient, model, endpoint)
+    create_or_update_deployment(mlclient, model, endpoint, environment)
 
     # check deployment
     endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=True)
@@ -157,7 +168,7 @@ if __name__ == '__main__':
     print(f'Prediction: {prediction}')
 
     logs = mlclient.online_deployments.get_logs(
-        name=deployment_name,
+        name='local',
         endpoint_name=ENDPOINT_NAME, 
         local=True, 
         lines=50
