@@ -2,7 +2,7 @@
 
 A repository to test developing, training and deploying a model to Azure using the Wisconsin BCa dataset. 
 
-Preprocessing and testing is done locally, and we build a `train.py` to train on the cloud.
+Preprocessing is done locally, with the ML pipeline in charge of training, registering and deploying the model.
 
 ## Local Deployment
 
