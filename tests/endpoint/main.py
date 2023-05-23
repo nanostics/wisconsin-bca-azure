@@ -13,7 +13,7 @@ from azure.ai.ml.entities import (
 from azure.identity import AzureCliCredential
 
 # CONSTANTS
-ENDPOINT_NAME='wisconsin-bca-endpoint-2'
+ENDPOINT_NAME='wisconsin-bca-endpoint'
 MODEL_NAME='wisconsin-BCa-model'
 
 
