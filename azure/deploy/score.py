@@ -1,3 +1,4 @@
+# COPY OF TESTS/ENDPOINT/SCORE.PY
 import os
 import joblib
 import numpy as np
@@ -14,7 +15,7 @@ def init():
 
     # tutorials omit the `wisconsin-BCa-model` folder in the path, but i had to add that in somehow
     model_path = os.path.join(
-        os.getenv('AZUREML_MODEL_DIR'), 'wisconsin-BCa-model/model.pkl')
+        os.getenv('AZUREML_MODEL_DIR'), 'model.pkl')
     # Deserialize the model file back into a sklearn model.
     MODEL = joblib.load(model_path)
 
