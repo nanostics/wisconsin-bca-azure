@@ -41,7 +41,7 @@ jobs:
       # https://github.com/s-weigand/setup-conda/issues/3
       - name: Cache Conda Environment
         id: cache
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ${{ env.CONDA_PATH }}
           key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
