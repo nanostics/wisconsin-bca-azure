@@ -32,10 +32,10 @@ def get_envs() -> tuple[str, str, str]:
 
 def get_mlclient() -> MLClient:
     '''
-    Returns a workspace object from the environment variables. 
-    
+    Returns a workspace object from the environment variables.
+
     Authenticates from the Azure CLI
-    
+
     Prerequisites:
     - installed azure-cli package
     - used az login command to log in to your Azure Subscription
@@ -96,14 +96,12 @@ def create_or_update_endpoint(mlclient: MLClient) -> OnlineEndpoint:
                 "training_dataset": "credit_defaults",
             }
         )
-        endpoint = mlclient.online_endpoints.begin_create_or_update(endpoint, local=True).result()
-
-        return endpoint
+        return mlclient.online_endpoints.begin_create_or_update(endpoint, local=True).result()
 
 
 def create_or_update_deployment(
-        mlclient: MLClient, 
-        model: Model, 
+        mlclient: MLClient,
+        model: Model,
         environment: Environment,
         endpoint: OnlineEndpoint
     ):
@@ -127,7 +125,7 @@ def create_or_update_deployment(
     )
     print(f'Initialized deployment {deployment.name}')
     # somehow this is returning a `ManagedOnlineDeployment` instead of a ``LROPoller[OnlineDeployment]` as expected
-    deployment_result = mlclient.online_deployments.begin_create_or_update(
+    mlclient.online_deployments.begin_create_or_update(
         deployment, local=True
     )
     print(f'Created deployment {deployment.name}')
@@ -139,7 +137,7 @@ def post_deployment(mlclient: MLClient):
     '''
     # check deployment
     endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=True)
-    print(f'Local endpoint created at {endpoint.scoring_uri}')
+    print(f'Local endpoint created at {endpoint.scoring_uri} with state {endpoint.provisioning_state}')
 
     # Passing hardcoded data to the endpoint to test it out
     # https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#invoke-the-local-endpoint-to-score-data-by-using-your-model
@@ -152,8 +150,8 @@ def post_deployment(mlclient: MLClient):
 
     logs = mlclient.online_deployments.get_logs(
         name='local',
-        endpoint_name=ENDPOINT_NAME, 
-        local=True, 
+        endpoint_name=ENDPOINT_NAME,
+        local=True,
         lines=50
     )
     print(logs)
