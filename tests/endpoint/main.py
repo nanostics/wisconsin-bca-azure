@@ -130,7 +130,6 @@ def create_or_update_deployment(
         )
     )
     print(f'Initialized deployment {deployment.name}')
-    # somehow this is returning a `ManagedOnlineDeployment` instead of a ``LROPoller[OnlineDeployment]` as expected
     mlclient.online_deployments.begin_create_or_update(
         deployment, local=True
     )
@@ -152,7 +151,7 @@ def post_deployment(mlclient: MLClient):
         request_file='tests/endpoint/sample_data.json',
         local=True
     )
-    print(f'Prediction: {prediction}')
+    print(f'*** Prediction: {prediction}')
 
     logs = mlclient.online_deployments.get_logs(
         name='local',
@@ -160,7 +159,9 @@ def post_deployment(mlclient: MLClient):
         local=True,
         lines=50
     )
+    print('\n\n=========== LOGS ===========')
     print(logs)
+    print('=========== LOGS END ===========')
 
 
 if __name__ == '__main__':
