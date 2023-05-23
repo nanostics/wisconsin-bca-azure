@@ -13,7 +13,7 @@ from azure.ai.ml.entities import (
 from azure.identity import AzureCliCredential
 
 # CONSTANTS
-ENDPOINT_NAME='wisconsin-bca-endpoint'
+ENDPOINT_NAME='wisconsin-bca-endpoint-2'
 MODEL_NAME='wisconsin-BCa-model'
 
 
@@ -86,7 +86,9 @@ def create_or_update_endpoint(mlclient: MLClient) -> OnlineEndpoint:
     creates endpoint if it doesn't exist, otherwise updates it
     '''
     try:
-        return mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=True)
+        endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=True)
+        print(f'Endpoint {ENDPOINT_NAME} exists, reusing it')
+        return endpoint
     except Exception as _:
         print(f'Endpoint {ENDPOINT_NAME} does not exist, creating it')
         # define an online endpoint
@@ -98,13 +100,15 @@ def create_or_update_endpoint(mlclient: MLClient) -> OnlineEndpoint:
                 "training_dataset": "credit_defaults",
             }
         )
-        return mlclient.online_endpoints.begin_create_or_update(endpoint, local=True).result()
+        # pylint gives an error saying this function returns a `LROPoller[OnlineEndpoint]`, but it's wrong!
+        # looking at the definition, if we pass `local=True`, it returns a `ManagedOnlineEndpoint`
+        return mlclient.online_endpoints.begin_create_or_update(endpoint, local=True)
 
 
 def create_or_update_deployment(
         mlclient: MLClient,
         model: Model,
-        environment: Environment,
+        env: Environment,
         endpoint: OnlineEndpoint
     ):
     '''
@@ -118,7 +122,7 @@ def create_or_update_deployment(
     deployment = ManagedOnlineDeployment(
         name='local',
         model=model,
-        environment=environment,
+        environment=env,
         endpoint_name=endpoint.name,
         # Compute instance list:
         # https://learn.microsoft.com/en-us/azure/machine-learning/reference-managed-online-endpoints-vm-sku-list?view=azureml-api-2
