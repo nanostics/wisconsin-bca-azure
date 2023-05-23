@@ -14,6 +14,8 @@ def init():
     # AZUREML_MODEL_DIR is an environment variable created during deployment.
     # It is the path to the model folder (./azureml-models/$MODEL_NAME/$VERSION)
     # For multiple models, it points to the folder containing all deployed models (./azureml-models)
+
+    # tutorials omit the `wisconsin-BCa-model` folder in the path, but i had to add that in somehow
     model_path = os.path.join(
         os.getenv('AZUREML_MODEL_DIR'), 'wisconsin-BCa-model/model.pkl')
     # Deserialize the model file back into a sklearn model.
