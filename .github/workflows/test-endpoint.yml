@@ -3,7 +3,9 @@ name: Conda Endpoint Test
 on: [ push ]
 
 env:
-  CONDA_PATH: 
+  # cache just the env folder, not the entire miniconda directory
+  # https://github.com/conda-incubator/setup-miniconda/issues/266
+  CONDA_PATH: /usr/share/miniconda/envs/__setup_conda
 
 jobs:
   test-endpoint:
