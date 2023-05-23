@@ -95,10 +95,7 @@ def create_or_update_endpoint(mlclient: MLClient) -> OnlineEndpoint:
         endpoint = ManagedOnlineEndpoint(
             name=ENDPOINT_NAME,
             description='A managed online endpoint for the wisconsin breast cancer dataset',
-            auth_mode="key",
-            tags={
-                "training_dataset": "credit_defaults",
-            }
+            auth_mode="key"
         )
         # pylint gives an error saying this function returns a `LROPoller[OnlineEndpoint]`, but it's wrong!
         # looking at the definition, if we pass `local=True`, it returns a `ManagedOnlineEndpoint`
@@ -112,11 +109,7 @@ def create_or_update_deployment(
         endpoint: OnlineEndpoint
     ):
     '''
-    Creates model deployment if it doesn't exist, else updates it
-
-    I kind of (?) use blue-green deployments here, but I'm not sure if it's the right way to do it
-    https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html
-    In theory, this should reduce downtime. If the deployment fails, the traffic is still routed to the old deployment.
+    Deploys a new model to the endpoint
     '''
     # define an online deployment
     deployment = ManagedOnlineDeployment(
