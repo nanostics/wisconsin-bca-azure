@@ -7,7 +7,8 @@ from azure.ai.ml.entities import (
     ManagedOnlineEndpoint, OnlineEndpoint,
     ManagedOnlineDeployment,
     Model,
-    Environment
+    Environment,
+    CodeConfiguration
 )
 from azure.identity import AzureCliCredential
 
@@ -65,7 +66,8 @@ def get_latest_model(mlclient: MLClient) -> Model:
     )
 
     mlclient.models.download(MODEL_NAME, str(latest_model_version), download_path='.azure-tmp')
-    return Model(path='.azure-tmp')
+    # Not sure why our model has a nested folder for `wisconsin-BCa-model` lol
+    return Model(path='.azure-tmp/wisconsin-BCa-model/wisconsin-BCa-model/model.pkl')
 
 
 def create_ml_environment() -> Environment:
@@ -121,7 +123,11 @@ def create_or_update_deployment(
         # Compute instance list:
         # https://learn.microsoft.com/en-us/azure/machine-learning/reference-managed-online-endpoints-vm-sku-list?view=azureml-api-2
         instance_type='Standard_DS3_v2',
-        instance_count=1
+        instance_count=1,
+        code_configuration=CodeConfiguration(
+            code='azure/deploy',
+            scoring_script='score.py'
+        )
     )
     print(f'Initialized deployment {deployment.name}')
     # somehow this is returning a `ManagedOnlineDeployment` instead of a ``LROPoller[OnlineDeployment]` as expected
@@ -158,10 +164,10 @@ def post_deployment(mlclient: MLClient):
 
 
 if __name__ == '__main__':
-    mlclient = get_mlclient()
-    model = get_latest_model(mlclient)
+    client = get_mlclient()
+    model = get_latest_model(client)
     environment = create_ml_environment()
-    endpoint = create_or_update_endpoint(mlclient)
-    create_or_update_deployment(mlclient, model, environment, endpoint)
+    endpoint = create_or_update_endpoint(client)
+    create_or_update_deployment(client, model, environment, endpoint)
 
-    post_deployment(mlclient)
+    post_deployment(client)
