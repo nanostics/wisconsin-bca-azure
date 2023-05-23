@@ -6,7 +6,7 @@ Preprocessing and testing is done locally, and we build a `train.py` to train on
 
 ## Local Deployment
 
-We can use a local development server with Docker to test our endpoint. See code in `deploy-local/`
+We can use a local development server with Docker to test our endpoint. See code in `tests/endpoint`
 
 - https://github.com/Azure/MachineLearningNotebooks/tree/master/how-to-use-azureml/deployment/deploy-to-local
 
