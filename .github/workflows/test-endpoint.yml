@@ -1,6 +1,8 @@
 name: Conda Endpoint Test
 
-on: [ push ]
+on:
+  push:
+  workflow_dispatch:
 
 env:
   # cache just the env folder, not the entire miniconda directory
