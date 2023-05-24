@@ -17,6 +17,7 @@ from azure.ai.ml.entities import (
     Environment,
     CodeConfiguration
 )
+from azure.ai.ml.exceptions import LocalEndpointInFailedStateError
 from azure.identity import AzureCliCredential
 
 
@@ -140,9 +141,9 @@ def create_or_update_deployment(
         env: Environment,
         endpoint: OnlineEndpoint,
         local: bool
-    ):
+    ) -> str:
     '''
-    Creates model deployment if it doesn't exist, else updates it
+    Creates model deployment if it doesn't exist, else updates it. Returns the deployment name to be used later on
 
     If `local=True`, we use local docker deployments
 
@@ -189,8 +190,10 @@ def create_or_update_deployment(
         endpoint.traffic = {deployment_name: 100}
         mlclient.online_endpoints.begin_create_or_update(endpoint).result()
 
+    return deployment_name
 
-def post_deployment(mlclient: MLClient, local: bool):
+
+def post_deployment(mlclient: MLClient, deployment_name: str, local: bool):
     '''
     Running some checks and printing some metadata after the endpoint has been deployed
     '''
@@ -204,35 +207,57 @@ def post_deployment(mlclient: MLClient, local: bool):
     print(f'Traffic: {endpoint.traffic}')
     print(f'State: {endpoint.provisioning_state}\n\n')
 
-    # Here, we want to check the deployment by sending it some hardcoded data in `sample_data.json`
-    # What's weird is that the first few requests to the endpoint usually fail 
-    # with a 502 Bad Gateway error (at least on local deployments)
-    # I feel like there should be a way to check if the endpoint is ready to receive requests, but I couldn't find anything
-    # In the endpoint metadata above, it always shows the state as "succeeded"
+
     while True:
-        # Passing hardcoded data to the endpoint to test it out
-        # https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#invoke-the-local-endpoint-to-score-data-by-using-your-model
-        prediction = mlclient.online_endpoints.invoke(
-            endpoint_name=ENDPOINT_NAME,
-            request_file='tests/endpoint/sample_data.json',
-            local=local
-        )
-        print(f'*** Prediction: {prediction}')
-        if "502 Bad Gateway" in prediction:
-            print('Bad gateway error, retrying...')
-            time.sleep(1)
-        elif prediction == "[0, 0]":
-            break
-        else:
-            print('Unexpected prediction result! Expecting [0, 0]')
-            # exit with error
+        try:
+            success = _predict_at_endpoint(mlclient, local)
+            if success:
+                break
+
+            time.sleep(2)
+        except LocalEndpointInFailedStateError:
+            print('Endpoint is in a failed state! Printing logs')
+            _print_logs(mlclient, local, deployment_name)
             sys.exit(1)
 
+    print('Endpoint creation and testing success!')
+    _print_logs(mlclient, local, deployment_name)
 
-    logs = mlclient.online_deployments.get_logs(
-        name='local',
+
+def _predict_at_endpoint(mlclient: MLClient, local: bool) -> bool:
+    '''
+    Passing hardcoded data to the endpoint to test it out. Returns `true` if the prediction is expected, `false` if we need to retry
+    Retries happen when the endpoint is not ready to receive requests yet (502 Bad Gateway error)
+    
+    Reference: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#invoke-the-local-endpoint-to-score-data-by-using-your-model
+    '''
+    prediction = mlclient.online_endpoints.invoke(
         endpoint_name=ENDPOINT_NAME,
-        local=True,
+        request_file='tests/endpoint/sample_data.json',
+        local=local
+    )
+    print(f'*** Prediction: {prediction}')
+    if "502 Bad Gateway" in prediction:
+         # What's weird is that the first few requests to the endpoint usually fail
+        # with a 502 Bad Gateway error (at least on local deployments)
+        # I feel like there should be a way to check if the endpoint is ready to receive requests, 
+        # but I couldn't find anything
+        # In the endpoint metadata (post_deployment function), it always shows the state as "succeeded"
+        print('Bad gateway error, retrying...')
+        return False
+    elif prediction == "[0, 0]":
+        return True
+    else:
+        print('Unexpected prediction result! Expecting [0, 0]')
+        # exit with error
+        sys.exit(1)
+
+
+def _print_logs(mlclient: MLClient, local: bool, deployment_name: str):
+    logs = mlclient.online_deployments.get_logs(
+        name=deployment_name,
+        endpoint_name=ENDPOINT_NAME,
+        local=local,
         lines=50
     )
     print('\n\n=========== LOGS ===========')
