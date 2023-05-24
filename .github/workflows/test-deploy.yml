@@ -10,8 +10,8 @@ on:
       - lib/*.py # helper files
 
 jobs:
-  test-endpoint:
-    name: Test Endpoint
+  test-deployment:
+    name: Test Deployment
     runs-on: ubuntu-latest
     env:
       # cache just the env folder, not the entire miniconda directory
