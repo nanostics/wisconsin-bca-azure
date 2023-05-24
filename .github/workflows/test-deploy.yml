@@ -1,4 +1,4 @@
-name: Endpoint Test
+name: Deploy Test
 
 on:
   workflow_dispatch:
@@ -58,7 +58,7 @@ jobs:
         # https://dev.to/epassaro/caching-anaconda-environments-in-github-actions-5hde
         if: steps.cache.outputs.cache-hit != 'true'
 
-      - name: Run Endpoint Test
+      - name: Run Deploy Test
         run: |
           PYTHONPATH="lib" python azure/deploy/main.py
         env:
