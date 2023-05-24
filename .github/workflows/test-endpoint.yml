@@ -59,7 +59,7 @@ jobs:
 
       - name: Run Endpoint Test
         run: |
-          PYTHONPATH="." python tests/endpoint/main.py
+          PYTHONPATH="lib" python tests/endpoint/main.py
         env:
           SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
