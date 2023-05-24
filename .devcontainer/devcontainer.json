@@ -22,7 +22,6 @@
 				"GitHub.copilot",
 				"ms-python.vscode-pylance",
 				"ms-python.python",
-				"ms-python.pylint",
 				"ms-toolsai.vscode-ai",
 				"ms-vscode.azure-account"
 			]
