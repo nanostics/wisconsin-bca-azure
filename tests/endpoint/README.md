@@ -14,12 +14,14 @@ Testing our online endpoint by running it locally, and then sending a request to
 
 ### Running
 
+Make sure you are in the root of the repository.
+
 ```bash
 export SUBSCRIPTION_ID=2676283c-665b-4d2f-bf73-2c380edf47d9
 export RESOURCE_GROUP=jnji-rg
 export WORKSPACE_NAME=joshua_nanostics_ml
 
-python tests/endpoint/main.py
+PYTHONPATH="." python tests/endpoint/main.py
 ```
 
 **Note:** Running the main script on my M1 Mac fails, but running it on Github Actions works. I'm guessing it might be an error with my ARM machine, since the Docker image used by the endpoint is only for x86_64.

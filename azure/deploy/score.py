@@ -1,4 +1,3 @@
-# COPY OF TESTS/ENDPOINT/SCORE.PY
 import os
 import joblib
 import numpy as np

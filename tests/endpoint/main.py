@@ -1,5 +1,5 @@
 # relative imports from azure/deploy/main.py
-from azure.deploy.main import get_mlclient, get_latest_model, create_ml_environment, create_or_update_deployment, create_or_update_endpoint, post_deployment
+from lib.deploy_helpers import get_mlclient, get_latest_model, create_ml_environment, create_or_update_deployment, create_or_update_endpoint, post_deployment
 
 # CONSTANTS
 ENDPOINT_NAME='wisconsin-bca-endpoint'
