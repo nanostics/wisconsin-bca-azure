@@ -29,11 +29,12 @@ jobs:
       parameters-file:  azure/train/pipeline.yml
       job-name: test
     secrets:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      creds: ${{ secrets.AZURE_CREDENTIALS }}
 
   test-endpoint:
     name: Test Endpoint Locally
     uses: ./.github/workflows/test-endpoint.yml
+    secrets: inherit
 
   deploy-endpoint:
     name: Deploy Endpoint

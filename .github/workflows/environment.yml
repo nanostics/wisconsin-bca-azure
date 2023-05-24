@@ -42,3 +42,4 @@ jobs:
 
   run-pipeline:
     uses: ./.github/workflows/pipeline.yml
+    secrets: inherit
