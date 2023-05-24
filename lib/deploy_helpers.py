@@ -80,12 +80,12 @@ def get_latest_model(mlclient: MLClient, local: bool) -> Model:
     return model
 
 
-def create_ml_environment() -> Environment:
+def create_ml_environment(local: bool) -> Environment:
     # assume the python file is being run in the root of the repo
+    env_name = 'local' if local else 'wisconsin-bca-env'
     env = Environment(
-        name='local',
+        name=env_name,
         conda_file='environment.yml',
-        # conda_file='azure/azure-env.yml',
         image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
     )
     print(f'Environment made {env.name}')
@@ -146,7 +146,7 @@ def create_or_update_deployment(
         if 'blue' in endpoint.traffic and endpoint.traffic['blue'] == 100:
             deployment_name, instance_type = 'green', "Standard_F4s_v2"
         else:
-            deployment_name, instance_type = 'blue', "Standard_DS3_v2"
+            deployment_name, instance_type = 'blue', "Standard_DS2_v2"
 
     # define an online deployment
     deployment = ManagedOnlineDeployment(
