@@ -12,6 +12,7 @@ on:
       - azure/train/pipeline.yml # azureml pipeline file
       - develop/*.py # python files responsible for running the pipeline
       - tests/endpoint/*.py # Python files responsible for testing the endpoint
+      - lib/*.py # Helper functions 
 
 
 jobs:

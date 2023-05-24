@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/test-endpoint.yml # this file
       - tests/endpoint/* # Files responsible for testing the endpoint
+      - lib/*.py # Helper functions 
 
 jobs:
   test-endpoint:
