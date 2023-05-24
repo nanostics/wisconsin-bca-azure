@@ -221,6 +221,9 @@ def post_deployment(mlclient: MLClient, deployment_name: str, local: bool):
             print('Endpoint is in a failed state! Printing logs')
             _print_logs(mlclient, local, deployment_name)
             sys.exit(1)
+        except Exception as err:
+            print(f'Unknown error: {err}')
+            sys.exit(1)
 
     print('Endpoint creation and testing success!')
     _print_logs(mlclient, local, deployment_name)
