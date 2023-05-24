@@ -80,8 +80,19 @@ def get_latest_model(mlclient: MLClient, local: bool) -> Model:
     return model
 
 
-def create_ml_environment(local: bool) -> Environment:
-    # assume the python file is being run in the root of the repo
+def ml_environment(local: bool) -> Environment:
+    '''
+    Gets an environment object for the model
+
+    If local, creates a new environment from the `environment.yml` file
+
+    If remote, gets the "wisconsin-bca-env" environment from the workspace
+    '''
+    if not local:
+        return Environment(name='wisconsin-bca-env')
+
+
+    # For local environments, assume the python file is being run in the root of the repo
     env_name = 'local' if local else 'wisconsin-bca-env'
     env = Environment(
         name=env_name,
