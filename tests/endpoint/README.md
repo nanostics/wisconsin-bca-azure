@@ -14,7 +14,9 @@ Testing our online endpoint by running it locally, and then sending a request to
 
 ### Running
 
-Make sure you are in the root of the repository.
+This file runs automatically when it detects changes to any files related to the endpoint. See [.github/workflows/test-endpoint.yml](../../.github/workflows/test-endpoint.yml) for more details.
+
+To run this yourself, make sure you are in the root of the repository. 
 
 ```bash
 export SUBSCRIPTION_ID=2676283c-665b-4d2f-bf73-2c380edf47d9
@@ -24,6 +26,9 @@ export WORKSPACE_NAME=joshua_nanostics_ml
 PYTHONPATH="lib" python tests/endpoint/main.py
 ```
 
+### Note on Relative Imports
+
+There seems to be dozens of ways to import relative files into a Python Script, and I've found `PYTHONPATH` to be the least painful to use. It also [integrates well with VSCode](https://stackoverflow.com/a/48977197). 
 
 ## Resources
 
