@@ -1,5 +1,5 @@
-# relative imports from azure/deploy/main.py
-from lib.deploy_helpers import get_mlclient, get_latest_model, create_ml_environment, create_or_update_deployment, create_or_update_endpoint, post_deployment
+# relative imports from lib/deploy_helpers.py
+import deploy_helpers as helper
 
 # CONSTANTS
 ENDPOINT_NAME='wisconsin-bca-endpoint'
@@ -7,13 +7,13 @@ MODEL_NAME='wisconsin-BCa-model'
 
 
 if __name__ == '__main__':
-    client = get_mlclient()
-    model = get_latest_model(client, local=True)
-    environment = create_ml_environment()
-    endpoint = create_or_update_endpoint(client, local=True)
-    create_or_update_deployment(client, model, environment, endpoint, local=True)
+    client = helper.get_mlclient()
+    model = helper.get_latest_model(client, local=True)
+    environment = helper.create_ml_environment()
+    endpoint = helper.create_or_update_endpoint(client, local=True)
+    helper.create_or_update_deployment(client, model, environment, endpoint, local=True)
 
-    post_deployment(client, local=True)
+    helper.post_deployment(client, local=True)
 
     # delete the endpoint
     print(f'Deleting endpoint {ENDPOINT_NAME}')

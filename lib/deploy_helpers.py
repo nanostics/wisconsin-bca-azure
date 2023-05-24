@@ -1,3 +1,9 @@
+'''
+# DEPLOY HELPERS
+
+A collection of helper functions to manage deploying a model to an Azure managed endpoint.
+Supports both local and remote endpoints.
+'''
 import os
 import time
 import sys
@@ -187,7 +193,8 @@ def post_deployment(mlclient: MLClient, local: bool):
     print(f'State: {endpoint.provisioning_state}\n\n')
 
     # Here, we want to check the deployment by sending it some hardcoded data in `sample_data.json`
-    # What's weird is that the first few requests to the endpoint usually fail with a 502 Bad Gateway error (at least on local deployments)
+    # What's weird is that the first few requests to the endpoint usually fail 
+    # with a 502 Bad Gateway error (at least on local deployments)
     # I feel like there should be a way to check if the endpoint is ready to receive requests, but I couldn't find anything
     # In the endpoint metadata above, it always shows the state as "succeeded"
     while True:

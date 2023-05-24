@@ -1,11 +1,11 @@
-from lib.deploy_helpers import get_mlclient, get_latest_model, create_ml_environment, create_or_update_deployment, create_or_update_endpoint, post_deployment
-
+# relative imports from lib/deploy_helpers.py
+import deploy_helpers as helper
 
 if __name__ == '__main__':
-    mlclient = get_mlclient()
-    model = get_latest_model(mlclient, local=False)
-    environment = create_ml_environment()
-    endpoint = create_or_update_endpoint(mlclient, local=False)
-    create_or_update_deployment(mlclient, model, environment, endpoint, local=False)
+    mlclient = helper.get_mlclient()
+    model = helper.get_latest_model(mlclient, local=False)
+    environment = helper.create_ml_environment()
+    endpoint = helper.create_or_update_endpoint(mlclient, local=False)
+    helper.create_or_update_deployment(mlclient, model, environment, endpoint, local=False)
 
-    post_deployment(mlclient, local=False)
+    helper.post_deployment(mlclient, local=False)
