@@ -14,19 +14,21 @@ Testing our online endpoint by running it locally, and then sending a request to
 
 ### Running
 
+This file runs automatically when it detects changes to any files related to the endpoint. See [.github/workflows/test-endpoint.yml](../../.github/workflows/test-endpoint.yml) for more details.
+
+To run this yourself, make sure you are in the root of the repository. 
+
 ```bash
 export SUBSCRIPTION_ID=2676283c-665b-4d2f-bf73-2c380edf47d9
 export RESOURCE_GROUP=jnji-rg
 export WORKSPACE_NAME=joshua_nanostics_ml
 
-cd tests/endpoint && python main.py
+PYTHONPATH="lib" python tests/endpoint/main.py
 ```
 
-**Note:** Running the main script on my M1 Mac fails, but running it on Github Actions works. I'm guessing it might be an error with my ARM machine, since the Docker image used by the endpoint is only for x86_64.
+### Note on Relative Imports
 
-```
-requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=6969): Max retries exceeded with url: /score (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0xffff92604700>: Failed to establish a new connection: [Errno 111] Connection refused'))
-```
+There seems to be dozens of ways to import relative files into a Python Script, and I've found `PYTHONPATH` to be the least painful to use. It also [integrates well with VSCode](https://stackoverflow.com/a/48977197). 
 
 ## Resources
 

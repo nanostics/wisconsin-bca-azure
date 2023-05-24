@@ -1,3 +1,9 @@
 mlruns
 config*.json
 secret.json
+
+# tmp files created by Azure during our script
+# e.g. downloading a model to test locally
+.azure-tmp
+
+**/__pycache__/
