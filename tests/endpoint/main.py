@@ -1,5 +1,4 @@
 import os
-import json
 
 # import required libraries
 from azure.ai.ml import MLClient
@@ -140,8 +139,8 @@ def post_deployment(mlclient: MLClient):
     '''
     # check deployment
     endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=True)
-    print(f'Local endpoint created at {endpoint.scoring_uri} with state {endpoint.provisioning_state}')
-
+    print(endpoint)
+    print(f'Got local endpoint {endpoint.scoring_uri} with state {endpoint.provisioning_state}')
     # Passing hardcoded data to the endpoint to test it out
     # https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#invoke-the-local-endpoint-to-score-data-by-using-your-model
     prediction = mlclient.online_endpoints.invoke(
@@ -160,6 +159,10 @@ def post_deployment(mlclient: MLClient):
     print('\n\n=========== LOGS ===========')
     print(logs)
     print('=========== LOGS END ===========')
+
+    # delete the endpoint
+    print(f'Deleting endpoint {ENDPOINT_NAME}')
+    mlclient.online_endpoints.begin_delete(name=ENDPOINT_NAME, local=True)
 
 
 if __name__ == '__main__':
