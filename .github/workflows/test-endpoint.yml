@@ -1,8 +1,12 @@
 name: Endpoint Test
 
 on:
-  push:
   workflow_dispatch:
+  workflow_call:
+  push:
+    paths:
+      - .github/workflows/test-endpoint.yml # this file
+      - tests/endpoint/* # Files responsible for testing the endpoint
 
 jobs:
   test-endpoint:
