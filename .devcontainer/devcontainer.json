@@ -21,7 +21,8 @@
 				"github.vscode-github-actions",
 				"GitHub.copilot",
 				"ms-python.vscode-pylance",
-				"ms-python.python"
+				"ms-python.python",
+				"ms-python.pylint"
 			]
 		}
 	}
