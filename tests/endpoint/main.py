@@ -74,7 +74,8 @@ def create_ml_environment() -> Environment:
     # assume the python file is being run in the root of the repo
     env = Environment(
         name='local',
-        conda_file='azure/azure-env.yml',
+        conda_file='environment.yml',
+        # conda_file='azure/azure-env.yml',
         image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
     )
     print(f'Environment made {env.name}')
