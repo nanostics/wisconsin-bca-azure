@@ -40,6 +40,10 @@ jobs:
     name: Deploy Endpoint
     runs-on: ubuntu-latest
     needs: [azure-pipeline, test-endpoint]
+    # this ensures only one instance of deploy-endpoint can be run at a time
+    # https://docs.github.com/en/actions/using-jobs/using-concurrency
+    # This is to avoid Azure `OperationDuplicationConflict` errors
+    concurrency: deploy-endpoint
     env:
       # cache just the env folder, not the entire miniconda directory
       # https://github.com/conda-incubator/setup-miniconda/issues/266
