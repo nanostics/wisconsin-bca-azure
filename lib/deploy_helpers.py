@@ -24,6 +24,7 @@ from azure.identity import AzureCliCredential
 # CONSTANTS
 ENDPOINT_NAME='wisconsin-bca-endpoint'
 MODEL_NAME='wisconsin-BCa-model'
+ENV_NAME='wisconsin-bca-env'
 
 
 def get_envs() -> tuple[str, str, str]:
@@ -98,16 +99,19 @@ def ml_environment(mlclient: MLClient, local: bool) -> Environment:
     Reference: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-environments-v2?view=azureml-api-2&tabs=python#create-an-environment-from-a-conda-specification
     '''
     # For local environments, assume the python file is being run in the root of the repo
-    env_name = 'local' if local else 'wisconsin-bca-env'
+    if not local:
+        latest_env_version = max(
+            [int(m.version) for m in mlclient.environments.list(ENV_NAME)]
+        )
+
+        return mlclient.environments.get(name=ENV_NAME, version=str(latest_env_version))
+
     env = Environment(
-        name=env_name,
+        name='local',
         conda_file='environment.yml',
         image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
     )
-    print(f'Environment made {env.name}')
-
-    if not local:
-        return mlclient.environments.create_or_update(env)
+    print(f'Local environment made:\n{env}')
 
     return env
 
