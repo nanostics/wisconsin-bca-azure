@@ -1,175 +1,20 @@
-import os
-
-# import required libraries
-from azure.ai.ml import MLClient
-from azure.ai.ml.entities import (
-    ManagedOnlineEndpoint, OnlineEndpoint,
-    ManagedOnlineDeployment,
-    Model,
-    Environment,
-    CodeConfiguration
-)
-from azure.identity import AzureCliCredential
+# relative imports from azure/deploy/main.py
+from azure.deploy.main import get_mlclient, get_latest_model, create_ml_environment, create_or_update_deployment, create_or_update_endpoint, post_deployment
 
 # CONSTANTS
 ENDPOINT_NAME='wisconsin-bca-endpoint'
 MODEL_NAME='wisconsin-BCa-model'
 
 
-def get_envs() -> tuple[str, str, str]:
-    '''
-    Looks in the environment for the following variables:
-    - `SUBSCRIPTION_ID`
-    - `RESOURCE_GROUP`
-    - `WORKSPACE_NAME`
-    '''
-    envs = ["SUBSCRIPTION_ID", "RESOURCE_GROUP", "WORKSPACE_NAME" ]
-    for env in envs:
-        if os.environ.get(env) is None:
-            raise Exception(f"Environment variable {env} is not set.")
-    return os.environ.get("SUBSCRIPTION_ID"), os.environ.get("RESOURCE_GROUP"), os.environ.get("WORKSPACE_NAME")
+if __name__ == '__main__':
+    client = get_mlclient()
+    model = get_latest_model(client, local=True)
+    environment = create_ml_environment()
+    endpoint = create_or_update_endpoint(client, local=True)
+    create_or_update_deployment(client, model, environment, endpoint, local=True)
 
-
-def get_mlclient() -> MLClient:
-    '''
-    Returns a workspace object from the environment variables.
-
-    Authenticates from the Azure CLI
-
-    Prerequisites:
-    - installed azure-cli package
-    - used az login command to log in to your Azure Subscription
-
-    This means we don't need an interactive authentication, so we can run this in CI
-    '''
-    # this uses the azure authentication in the Azure CLI
-    cli_auth = AzureCliCredential()
-
-    subscription_id, resource_group, workspace_name = get_envs()
-    ml_client = MLClient(cli_auth, subscription_id, resource_group, workspace_name)
-
-    return ml_client
-
-
-def get_latest_model(mlclient: MLClient) -> Model:
-    '''
-    Returns the latest model (wisconsin-bca-model) from the workspace
-    As this is local, we download the model first. Azure SDK Local endpoints do not support
-    remote model files.
-
-    # https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#deploy-and-debug-locally-by-using-local-endpoints
-    '''
-    # Let's pick the latest version of the model
-    latest_model_version = max(
-        [int(m.version) for m in mlclient.models.list(name=MODEL_NAME)]
-    )
-
-    mlclient.models.download(MODEL_NAME, str(latest_model_version), download_path='.azure-tmp')
-    # Not sure why our model has a nested folder for `wisconsin-BCa-model` lol
-    return Model(path='.azure-tmp/wisconsin-BCa-model/wisconsin-BCa-model/model.pkl')
-
-
-def create_ml_environment() -> Environment:
-    # assume the python file is being run in the root of the repo
-    env = Environment(
-        name='local',
-        conda_file='environment.yml',
-        # conda_file='azure/azure-env.yml',
-        image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
-    )
-    print(f'Environment made {env.name}')
-    return env
-
-
-def create_or_update_endpoint(mlclient: MLClient) -> OnlineEndpoint:
-    '''
-    creates endpoint if it doesn't exist, otherwise updates it
-    '''
-    try:
-        endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=True)
-        print(f'Endpoint {ENDPOINT_NAME} exists, reusing it')
-        return endpoint
-    except Exception as _:
-        print(f'Endpoint {ENDPOINT_NAME} does not exist, creating it')
-        # define an online endpoint
-        endpoint = ManagedOnlineEndpoint(
-            name=ENDPOINT_NAME,
-            description='A managed online endpoint for the wisconsin breast cancer dataset',
-            auth_mode="key"
-        )
-        # pylint gives an error saying this function returns a `LROPoller[OnlineEndpoint]`, but it's wrong!
-        # looking at the definition, if we pass `local=True`, it returns a `ManagedOnlineEndpoint`
-        return mlclient.online_endpoints.begin_create_or_update(endpoint, local=True)
-
-
-def create_or_update_deployment(
-        mlclient: MLClient,
-        model: Model,
-        env: Environment,
-        endpoint: OnlineEndpoint
-    ):
-    '''
-    Deploys a new model to the endpoint
-    '''
-    # define an online deployment
-    deployment = ManagedOnlineDeployment(
-        name='local',
-        model=model,
-        environment=env,
-        endpoint_name=endpoint.name,
-        # Compute instance list:
-        # https://learn.microsoft.com/en-us/azure/machine-learning/reference-managed-online-endpoints-vm-sku-list?view=azureml-api-2
-        instance_type='Standard_DS3_v2',
-        instance_count=1,
-        code_configuration=CodeConfiguration(
-            code='azure/deploy',
-            scoring_script='score.py'
-        )
-    )
-    print(f'Initialized deployment {deployment.name}')
-    mlclient.online_deployments.begin_create_or_update(
-        deployment, local=True
-    )
-    print(f'Created deployment {deployment.name}')
-
-
-def post_deployment(mlclient: MLClient):
-    '''
-    What to run after the online endpoint has deployed
-    '''
-    # check deployment
-    endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=True)
-    print(endpoint)
-    print(f'Got local endpoint {endpoint.scoring_uri} with state {endpoint.provisioning_state}')
-    # Passing hardcoded data to the endpoint to test it out
-    # https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#invoke-the-local-endpoint-to-score-data-by-using-your-model
-    prediction = mlclient.online_endpoints.invoke(
-        endpoint_name=ENDPOINT_NAME,
-        request_file='tests/endpoint/sample_data.json',
-        local=True
-    )
-    print(f'*** Prediction: {prediction}')
-
-    logs = mlclient.online_deployments.get_logs(
-        name='local',
-        endpoint_name=ENDPOINT_NAME,
-        local=True,
-        lines=50
-    )
-    print('\n\n=========== LOGS ===========')
-    print(logs)
-    print('=========== LOGS END ===========')
+    post_deployment(client, local=True)
 
     # delete the endpoint
     print(f'Deleting endpoint {ENDPOINT_NAME}')
-    mlclient.online_endpoints.begin_delete(name=ENDPOINT_NAME, local=True)
-
-
-if __name__ == '__main__':
-    client = get_mlclient()
-    model = get_latest_model(client)
-    environment = create_ml_environment()
-    endpoint = create_or_update_endpoint(client)
-    create_or_update_deployment(client, model, environment, endpoint)
-
-    post_deployment(client)
+    client.online_endpoints.begin_delete(name=ENDPOINT_NAME, local=True)
