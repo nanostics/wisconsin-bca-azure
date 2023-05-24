@@ -83,18 +83,20 @@ def get_latest_model(mlclient: MLClient, local: bool) -> Model:
     return model
 
 
-def ml_environment(local: bool) -> Environment:
+def ml_environment(mlclient: MLClient, local: bool) -> Environment:
     '''
     Gets an environment object for the model
 
     If local, creates a new environment from the `environment.yml` file
 
     If remote, gets the "wisconsin-bca-env" environment from the workspace
+
+    It doesn't seem like I can query an environment with just its name like how I query models. 
+    This is kinda unfortunate but it seems like I have to make a new model every time I push
+    Although I think Azure is smart enough to not make a new model if everything else is the same
+
+    Reference: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-environments-v2?view=azureml-api-2&tabs=python#create-an-environment-from-a-conda-specification
     '''
-    if not local:
-        return Environment(name='wisconsin-bca-env')
-
-
     # For local environments, assume the python file is being run in the root of the repo
     env_name = 'local' if local else 'wisconsin-bca-env'
     env = Environment(
@@ -103,6 +105,10 @@ def ml_environment(local: bool) -> Environment:
         image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
     )
     print(f'Environment made {env.name}')
+
+    if not local:
+        return mlclient.environments.create_or_update(env)
+
     return env
 
 
