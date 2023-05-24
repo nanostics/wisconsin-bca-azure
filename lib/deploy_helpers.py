@@ -125,7 +125,8 @@ def create_or_update_endpoint(mlclient: MLClient, local: bool) -> OnlineEndpoint
             # pylint gives an error saying this function returns a `LROPoller[OnlineEndpoint]`, but it's wrong!
             # looking at how `begin_create_or_update` is defined for local runs,
             # if we pass `local=True`, it returns a `ManagedOnlineEndpoint`
-            return endpoint
+            # We ignore the type error at the end of the line: https://github.com/microsoft/pylance-release/issues/196
+            return endpoint #type: ignore
         else:
             # wait for the endpoint to be created
             endpoint = endpoint.result()
