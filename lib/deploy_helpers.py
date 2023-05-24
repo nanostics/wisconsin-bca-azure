@@ -74,7 +74,9 @@ def get_latest_model(mlclient: MLClient, local: bool) -> Model:
     if local:
         mlclient.models.download(MODEL_NAME, str(latest_model_version), download_path='.azure-tmp')
         # Not sure why our model has a nested folder for `wisconsin-BCa-model` lol
-        return Model(path='.azure-tmp/wisconsin-BCa-model/wisconsin-BCa-model/model.pkl')
+        # still, we need to specify exactly this path, or we will have inconsistencies 
+        # between local and remote
+        return Model(path='.azure-tmp/wisconsin-BCa-model/wisconsin-BCa-model')
 
     model = mlclient.models.get(name=MODEL_NAME, version=str(latest_model_version))
     print(f'Got model {model.name} with version {model.version}')

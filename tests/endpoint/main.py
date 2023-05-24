@@ -11,9 +11,9 @@ if __name__ == '__main__':
     model = helper.get_latest_model(client, local=True)
     environment = helper.ml_environment(local=True)
     endpoint = helper.create_or_update_endpoint(client, local=True)
-    helper.create_or_update_deployment(client, model, environment, endpoint, local=True)
+    deployment_name = helper.create_or_update_deployment(client, model, environment, endpoint, local=True)
 
-    helper.post_deployment(client, local=True)
+    helper.post_deployment(client, deployment_name, local=True)
 
     # delete the endpoint
     print(f'Deleting endpoint {ENDPOINT_NAME}')
