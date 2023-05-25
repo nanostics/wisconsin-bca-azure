@@ -5,7 +5,7 @@ name: base
 channels:
   - defaults
 dependencies:
-  - python=3.9.13
+  - python=3.11.3
   - pip
   - pip:
       - numpy
@@ -14,4 +14,4 @@ dependencies:
       - mlflow[extras]
       - inference-schema
       - azureml-inference-server-http # needed to run local endpoint
-      - azure-cli
+      - azure-cli # delete?
