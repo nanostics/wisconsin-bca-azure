@@ -28,11 +28,12 @@ jobs:
       parameters-file:  azure/train/pipeline.yml
       job-name: test
     secrets:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      creds: ${{ secrets.AZURE_CREDENTIALS }}
 
   test-endpoint:
     name: Test Endpoint Locally
     uses: ./.github/workflows/test-endpoint.yml
+    secrets: inherit
 
   deploy-endpoint:
     name: Deploy Endpoint
@@ -41,6 +42,10 @@ jobs:
     # run only if it's a push to main (and not a PR)
     # https://stackoverflow.com/a/66206183
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    # this ensures only one instance of deploy-endpoint can be run at a time
+    # https://docs.github.com/en/actions/using-jobs/using-concurrency
+    # This is to avoid Azure `OperationDuplicationConflict` errors
+    concurrency: deploy-endpoint
     env:
       # cache just the env folder, not the entire miniconda directory
       # https://github.com/conda-incubator/setup-miniconda/issues/266
