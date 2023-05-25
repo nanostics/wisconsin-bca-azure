@@ -38,7 +38,11 @@ def get_envs() -> tuple[str, str, str]:
             raise Exception(f"Environment variable {env} is not set.")
         return e_val
 
-    return get_single_env('SUBSCRIPTION_ID'), get_single_env('RESOURCE_GROUP'), get_single_env('WORKSPACE_NAME')
+    return (
+        get_single_env('SUBSCRIPTION_ID'), 
+        get_single_env('RESOURCE_GROUP'), 
+        get_single_env('WORKSPACE_NAME')
+    )
 
 
 def get_mlclient() -> MLClient:
@@ -68,11 +72,15 @@ def get_latest_model(mlclient: MLClient, local: bool) -> Model:
     '''
     # Let's pick the latest version of the model
     latest_model_version = max(
-        [int(m.version) for m in mlclient.models.list(name=constants.MODEL_NAME)]
+        int(m.version) for m in mlclient.models.list(name=constants.MODEL_NAME)
     )
 
     if local:
-        mlclient.models.download(constants.MODEL_NAME, str(latest_model_version), download_path='.azure-tmp')
+        mlclient.models.download(
+            constants.MODEL_NAME, 
+            str(latest_model_version), 
+            download_path='.azure-tmp'
+        )
         # Not sure why our model has a nested folder for `wisconsin-BCa-model` lol
         # still, we need to specify exactly this path, or we will have inconsistencies 
         # between local and remote
@@ -154,13 +162,15 @@ def create_or_update_deployment(
         local: bool
     ) -> str:
     '''
-    Creates model deployment if it doesn't exist, else updates it. Returns the deployment name to be used later on
+    Creates model deployment if it doesn't exist, else updates it. 
+    Returns the deployment name to be used later on
 
     If `local=True`, we use local docker deployments
 
     I kind of (?) use blue-green deployments here, but I'm not sure if it's the right way to do it
     https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html
-    In theory, this should reduce downtime. If the deployment fails, the traffic is still routed to the old deployment.
+    In theory, this should reduce downtime. 
+    If the deployment fails, the traffic is still routed to the old deployment.
     '''
     if local:
         deployment_name, instance_type = 'local', "Standard_DS3_v2"
@@ -240,9 +250,10 @@ def post_deployment(mlclient: MLClient, deployment_name: str, local: bool):
 
 def _predict_at_endpoint(mlclient: MLClient, local: bool) -> bool:
     '''
-    Passing hardcoded data to the endpoint to test it out. Returns `true` if the prediction is expected, `false` if we need to retry
+    Passing hardcoded data to the endpoint to test it out. 
+    Returns `true` if the prediction is expected, `false` if we need to retry
     Retries happen when the endpoint is not ready to receive requests yet (502 Bad Gateway error)
-    
+
     Reference: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#invoke-the-local-endpoint-to-score-data-by-using-your-model
     '''
     prediction = mlclient.online_endpoints.invoke(
@@ -254,7 +265,7 @@ def _predict_at_endpoint(mlclient: MLClient, local: bool) -> bool:
     if "502 Bad Gateway" in prediction:
          # What's weird is that the first few requests to the endpoint usually fail
         # with a 502 Bad Gateway error (at least on local deployments)
-        # I feel like there should be a way to check if the endpoint is ready to receive requests, 
+        # I feel like there should be a way to check if the endpoint is ready to receive requests,
         # but I couldn't find anything
         # In the endpoint metadata (post_deployment function), it always shows the state as "succeeded"
         print('Bad gateway error, retrying...')
