@@ -11,6 +11,11 @@ on:
       - .github/workflows/environment.yml # this file
       - environment.yml # actual conda environment file
       - azure/env/update.py # script to update environment
+  pull_request:
+    paths:
+      - .github/workflows/environment.yml # this file
+      - environment.yml # actual conda environment file
+      - azure/env/update.py # script to update environment
 
 jobs:
   # this runs train-evaluate-register stuff on the Azure compute instances.
@@ -66,7 +71,9 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
 
       # version automatically updates, even if environment.yml doesn't change
+      # we only actually deploy if the workflow is triggered by a push to main
       - name: Run Deploy
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           PYTHONPATH="lib" python azure/env/update.py
         env:
