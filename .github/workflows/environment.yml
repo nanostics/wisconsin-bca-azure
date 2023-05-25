@@ -71,9 +71,10 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
 
       # version automatically updates, even if environment.yml doesn't change
-      # we only actually deploy if the workflow is triggered by a push to main
       - name: Run Deploy
-        if: steps.cache.outputs.cache-hit != 'true'
+        # run only if it's a push to main (and not a PR)
+        # https://stackoverflow.com/a/66206183
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
           PYTHONPATH="lib" python azure/env/update.py
         env:
