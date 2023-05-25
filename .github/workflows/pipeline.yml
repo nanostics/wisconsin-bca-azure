@@ -9,9 +9,8 @@ on:
       - main
     paths:
       - .github/workflows/pipeline.yml # this file
-      - azure/train/pipeline.yml # azureml pipeline file
+      - azure/train/* # Pipeline files
       - azure/deploy/*.py # deployment scripts
-      - develop/*.py # python files responsible for running the pipeline
       - tests/endpoint/*.py # Python files responsible for testing the endpoint
       - lib/*.py # Helper functions 
 
