@@ -14,6 +14,6 @@ dependencies:
       - azure-ai-ml
       - mlflow[extras]
       - inference-schema
-      - pylint==2.17.4
+      - pylint==2.17.4 # for development
       - azureml-inference-server-http # needed to run local endpoint
       - azure-cli # used in Github Actions
