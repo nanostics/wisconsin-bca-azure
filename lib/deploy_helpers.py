@@ -35,7 +35,8 @@ def get_envs() -> tuple[str, str, str]:
     def get_single_env(env: str) -> str:
         e_val = os.environ.get(env)
         if e_val is None:
-            raise Exception(f"Environment variable {env} is not set.")
+            print(f'Environment variable {env} is not set! Exiting')
+            sys.exit(1)
         return e_val
 
     return (

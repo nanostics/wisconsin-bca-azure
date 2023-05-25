@@ -5,13 +5,15 @@ name: base
 channels:
   - defaults
 dependencies:
-  - python=3.9.13
+  - python=3.10
   - pip
   - pip:
       - numpy
+      - scikit-learn==1.2.2
       - azureml-mlflow
-      - azure-ai-ml
-      - mlflow[extras]
-      - inference-schema
-      - azureml-inference-server-http # needed to run local endpoint
-      - azure-cli
+      - azure-ai-ml # azure/
+      - mlflow[extras] # azure/train
+      - inference-schema # azure/deploy/score.py
+      - azureml-inference-server-http # needed to run local endpoint i guess?
+      - pylint # for development
+      - azure-cli # used in Github Actions

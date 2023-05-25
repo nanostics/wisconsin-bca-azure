@@ -15,6 +15,15 @@
 	},
 	"customizations": {
 		"vscode": {
+			// set default python interpreter to our custom conda env
+			"settings": {
+				"python.defaultInterpreterPath": "/opt/conda/envs/env",
+				// the `conda activate env` I add to `~/.bashrc` in `postcreate.sh` works better
+				// than the activateEnvironment here.
+				"python.terminal.activateEnvironment": false,
+				// default pylint won't be able to resolve dependencies in our custom conda environment
+				"python.linting.pylintPath": "/opt/conda/envs/env/bin/pylint"
+			},
 			"extensions": [
 				"ms-toolsai.jupyter",
 				"ms-azuretools.vscode-docker",
@@ -26,7 +35,9 @@
 				"ms-vscode.azure-account"
 			]
 		}
-	}
+	},
+	// My custom post create command initializes conda and does some other stuff
+	"postCreateCommand": "./.devcontainer/postcreate.sh"
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

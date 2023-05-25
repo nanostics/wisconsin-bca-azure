@@ -1,5 +1,7 @@
-name: Upload New Environment
+name: Environment Changed
 
+# Update environment (push changes to Azure if it's a push to main)
+# Then run Pipeline to see if everything is working with the new environment
 
 on: 
   workflow_dispatch:
@@ -7,6 +9,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/environment.yml # this file
+      - environment.yml # actual conda environment file
+      - azure/env/update.py # script to update environment
+  pull_request:
     paths:
       - .github/workflows/environment.yml # this file
       - environment.yml # actual conda environment file
@@ -67,6 +74,9 @@ jobs:
 
       # version automatically updates, even if environment.yml doesn't change
       - name: Run Deploy
+        # run only if it's a push to main (and not a PR)
+        # https://stackoverflow.com/a/66206183
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
           PYTHONPATH="lib" python azure/env/update.py
         env:
