@@ -35,7 +35,8 @@ def get_envs() -> tuple[str, str, str]:
     def get_single_env(env: str) -> str:
         e_val = os.environ.get(env)
         if e_val is None:
-            raise Exception(f"Environment variable {env} is not set.")
+            print(f'Environment variable {env} is not set! Exiting')
+            sys.exit(1)
         return e_val
 
     return (
@@ -116,7 +117,7 @@ def ml_environment(mlclient: MLClient, local: bool) -> Environment:
     env = Environment(
         name='local',
         conda_file='environment.yml',
-        image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
+        image='mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference:latest'
     )
     print(f'Local environment made:\n{env}')
 
