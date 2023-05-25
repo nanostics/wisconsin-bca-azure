@@ -8,11 +8,11 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/pipeline.yml # this file
-      - azure/train/* # Pipeline files
-      - azure/deploy/*.py # deployment scripts
-      - tests/endpoint/*.py # Python files responsible for testing the endpoint
-      - lib/*.py # Helper functions 
+      - '!*.md'
+  # run on every pull request, but not those that only change markdown files
+  pull_request:
+    paths:
+      - '!*.md'
 
 
 jobs:
@@ -38,6 +38,9 @@ jobs:
     name: Deploy Endpoint
     runs-on: ubuntu-latest
     needs: [azure-pipeline, test-endpoint]
+    # run only if it's a push to main (and not a PR)
+    # https://stackoverflow.com/a/66206183
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     env:
       # cache just the env folder, not the entire miniconda directory
       # https://github.com/conda-incubator/setup-miniconda/issues/266
@@ -83,7 +86,7 @@ jobs:
         # https://dev.to/epassaro/caching-anaconda-environments-in-github-actions-5hde
         if: steps.cache.outputs.cache-hit != 'true'
 
-      - name: Run Deploy Test
+      - name: Run Deploy
         run: |
           PYTHONPATH="lib" python azure/deploy/main.py
         env:
