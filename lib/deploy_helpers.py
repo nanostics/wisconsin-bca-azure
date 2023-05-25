@@ -91,7 +91,7 @@ def get_latest_model(mlclient: MLClient, local: bool) -> Model:
     return model
 
 
-def ml_environment(mlclient: MLClient, local: bool) -> Environment:
+def ml_environment(mlclient: MLClient, local: bool, localName='local') -> Environment:
     '''
     Gets an environment object for the model
 
@@ -114,9 +114,9 @@ def ml_environment(mlclient: MLClient, local: bool) -> Environment:
         return mlclient.environments.get(name=constants.ENV_NAME, version=str(latest_env_version))
 
     env = Environment(
-        name='local',
+        name=localName,
         conda_file='environment.yml',
-        image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
+        image='mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference:latest'
     )
     print(f'Local environment made:\n{env}')
 
