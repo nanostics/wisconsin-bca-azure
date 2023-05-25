@@ -9,9 +9,10 @@ dependencies:
   - pip
   - pip:
       - numpy
+      - scikit-learn==1.2.2
       - azureml-mlflow
       - azure-ai-ml
       - mlflow[extras]
       - inference-schema
       - azureml-inference-server-http # needed to run local endpoint
-      - azure-cli # delete?
+      - azure-cli # used in Github Actions
