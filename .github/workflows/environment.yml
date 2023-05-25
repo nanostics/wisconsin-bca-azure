@@ -1,5 +1,7 @@
-name: Upload New Environment
+name: Environment Changed
 
+# Update environment (push changes to Azure if it's a push to main)
+# Then run Pipeline to see if everything is working with the new environment
 
 on: 
   workflow_dispatch:
