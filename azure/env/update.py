@@ -7,10 +7,7 @@ Usage: Run from the root of the repository
 PYTHONPATH="lib" python azure/env/update.py
 ```
 '''
-import constants
 import deploy_helpers
-
-from azure.ai.ml.entities import Environment
 
 
 if __name__ == '__main__':
