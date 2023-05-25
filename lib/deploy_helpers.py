@@ -8,6 +8,8 @@ import os
 import time
 import sys
 
+import constants
+
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
     ManagedOnlineEndpoint,
@@ -19,12 +21,6 @@ from azure.ai.ml.entities import (
 )
 from azure.ai.ml.exceptions import LocalEndpointInFailedStateError
 from azure.identity import AzureCliCredential
-
-
-# CONSTANTS
-ENDPOINT_NAME='wisconsin-bca-endpoint'
-MODEL_NAME='wisconsin-BCa-model'
-ENV_NAME='wisconsin-bca-env'
 
 
 def get_envs() -> tuple[str, str, str]:
@@ -69,17 +65,17 @@ def get_latest_model(mlclient: MLClient, local: bool) -> Model:
     '''
     # Let's pick the latest version of the model
     latest_model_version = max(
-        [int(m.version) for m in mlclient.models.list(name=MODEL_NAME)]
+        [int(m.version) for m in mlclient.models.list(name=constants.MODEL_NAME)]
     )
 
     if local:
-        mlclient.models.download(MODEL_NAME, str(latest_model_version), download_path='.azure-tmp')
+        mlclient.models.download(constants.MODEL_NAME, str(latest_model_version), download_path='.azure-tmp')
         # Not sure why our model has a nested folder for `wisconsin-BCa-model` lol
         # still, we need to specify exactly this path, or we will have inconsistencies 
         # between local and remote
         return Model(path='.azure-tmp/wisconsin-BCa-model/wisconsin-BCa-model')
 
-    model = mlclient.models.get(name=MODEL_NAME, version=str(latest_model_version))
+    model = mlclient.models.get(name=constants.MODEL_NAME, version=str(latest_model_version))
     print(f'Got model {model.name} with version {model.version}')
     return model
 
@@ -101,10 +97,10 @@ def ml_environment(mlclient: MLClient, local: bool) -> Environment:
     # For local environments, assume the python file is being run in the root of the repo
     if not local:
         latest_env_version = max(
-            [int(m.version) for m in mlclient.environments.list(ENV_NAME)]
+            [int(m.version) for m in mlclient.environments.list(constants.ENV_NAME)]
         )
 
-        return mlclient.environments.get(name=ENV_NAME, version=str(latest_env_version))
+        return mlclient.environments.get(name=constants.ENV_NAME, version=str(latest_env_version))
 
     env = Environment(
         name='local',
@@ -121,14 +117,14 @@ def create_or_update_endpoint(mlclient: MLClient, local: bool) -> OnlineEndpoint
     creates endpoint if it doesn't exist, otherwise updates it
     '''
     try:
-        endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=local)
-        print(f'Endpoint {ENDPOINT_NAME} exists, reusing it')
+        endpoint = mlclient.online_endpoints.get(name=constants.ENDPOINT_NAME, local=local)
+        print(f'Endpoint {constants.ENDPOINT_NAME} exists, reusing it')
         return endpoint
     except Exception as _:
-        print(f'Endpoint {ENDPOINT_NAME} does not exist, creating it')
+        print(f'Endpoint {constants.ENDPOINT_NAME} does not exist, creating it')
         # define an online endpoint
         endpoint = ManagedOnlineEndpoint(
-            name=ENDPOINT_NAME,
+            name=constants.ENDPOINT_NAME,
             description='A managed online endpoint for the wisconsin breast cancer dataset',
             auth_mode="key"
         )
@@ -210,7 +206,7 @@ def post_deployment(mlclient: MLClient, deployment_name: str, local: bool):
     Running some checks and printing some metadata after the endpoint has been deployed
     '''
     # check deployment
-    endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=local)
+    endpoint = mlclient.online_endpoints.get(name=constants.ENDPOINT_NAME, local=local)
     # print endpoint metadata
     print(f'\n\n***ENDPOINT METADATA: {endpoint.name}***')
     print(f'Description: {endpoint.description}')
@@ -247,7 +243,7 @@ def _predict_at_endpoint(mlclient: MLClient, local: bool) -> bool:
     Reference: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#invoke-the-local-endpoint-to-score-data-by-using-your-model
     '''
     prediction = mlclient.online_endpoints.invoke(
-        endpoint_name=ENDPOINT_NAME,
+        endpoint_name=constants.ENDPOINT_NAME,
         request_file='tests/endpoint/sample_data.json',
         local=local
     )
@@ -271,7 +267,7 @@ def _predict_at_endpoint(mlclient: MLClient, local: bool) -> bool:
 def _print_logs(mlclient: MLClient, local: bool, deployment_name: str):
     logs = mlclient.online_deployments.get_logs(
         name=deployment_name,
-        endpoint_name=ENDPOINT_NAME,
+        endpoint_name=constants.ENDPOINT_NAME,
         local=local,
         lines=50
     )
