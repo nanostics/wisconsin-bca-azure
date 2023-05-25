@@ -18,8 +18,9 @@
 			// set default python interpreter to our custom conda env
 			"settings": {
 				"python.defaultInterpreterPath": "/opt/conda/envs/env",
-				"python.terminal.activateEnvironment": true,
-				"python.condaPath": "/opt/conda/envs/env/bin/python"
+				// the `conda activate env` I add to `~/.bashrc` in `postcreate.sh` works better
+				// than the activateEnvironment here.
+				"python.terminal.activateEnvironment": false
 			},
 			"extensions": [
 				"ms-toolsai.jupyter",

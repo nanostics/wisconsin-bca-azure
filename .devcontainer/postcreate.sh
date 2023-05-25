@@ -10,6 +10,7 @@ yes N | conda init || true
 
 # after conda initializes, we can activate the environment
 # this makes sure we have our custom env activated in our new terminals
+# I find this is a better UX than vscode's "python.terminal.activateEnvironment" setting
 echo 'conda activate env' >> ~/.bashrc
 
 # bash colours: https://stackoverflow.com/a/5947802
