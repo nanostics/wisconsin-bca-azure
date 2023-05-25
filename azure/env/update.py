@@ -15,11 +15,7 @@ from azure.ai.ml.entities import Environment
 
 if __name__ == '__main__':
     mlclient = deploy_helpers.get_mlclient()
-    new_env = Environment(
-        name=constants.ENV_NAME,
-        conda_file='environment.yml',
-        image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
-    )
+    new_env = deploy_helpers.ml_environment(mlclient, local=True)
     print('Creating new environment:\n')
     print(new_env)
 
