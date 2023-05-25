@@ -1,3 +1,10 @@
+'''
+Deploys the latest model to the Azure ML service as a managed online endpoint
+
+A lot of the deploy code is very similar to testing a local endpoint, 
+so much of the code is shared in `lib/deploy_helpers.py`.
+'''
+
 # relative imports from lib/deploy_helpers.py
 import deploy_helpers as helper
 

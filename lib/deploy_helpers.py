@@ -8,6 +8,8 @@ import os
 import time
 import sys
 
+import constants
+
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
     ManagedOnlineEndpoint,
@@ -21,11 +23,6 @@ from azure.ai.ml.exceptions import LocalEndpointInFailedStateError
 from azure.identity import AzureCliCredential
 
 
-# CONSTANTS
-ENDPOINT_NAME='wisconsin-bca-endpoint'
-MODEL_NAME='wisconsin-BCa-model'
-
-
 def get_envs() -> tuple[str, str, str]:
     '''
     Looks in the environment for the following variables:
@@ -33,12 +30,19 @@ def get_envs() -> tuple[str, str, str]:
     - `RESOURCE_GROUP`
     - `WORKSPACE_NAME`
     '''
-    envs = ["SUBSCRIPTION_ID", "RESOURCE_GROUP", "WORKSPACE_NAME" ]
 
-    for env in envs:
-        if os.environ.get(env) is None:
+    # type-safe function to get a single environment variable
+    def get_single_env(env: str) -> str:
+        e_val = os.environ.get(env)
+        if e_val is None:
             raise Exception(f"Environment variable {env} is not set.")
-    return os.environ.get("SUBSCRIPTION_ID"), os.environ.get("RESOURCE_GROUP"), os.environ.get("WORKSPACE_NAME")
+        return e_val
+
+    return (
+        get_single_env('SUBSCRIPTION_ID'), 
+        get_single_env('RESOURCE_GROUP'), 
+        get_single_env('WORKSPACE_NAME')
+    )
 
 
 def get_mlclient() -> MLClient:
@@ -68,17 +72,21 @@ def get_latest_model(mlclient: MLClient, local: bool) -> Model:
     '''
     # Let's pick the latest version of the model
     latest_model_version = max(
-        [int(m.version) for m in mlclient.models.list(name=MODEL_NAME)]
+        int(m.version) for m in mlclient.models.list(name=constants.MODEL_NAME)
     )
 
     if local:
-        mlclient.models.download(MODEL_NAME, str(latest_model_version), download_path='.azure-tmp')
+        mlclient.models.download(
+            constants.MODEL_NAME, 
+            str(latest_model_version), 
+            download_path='.azure-tmp'
+        )
         # Not sure why our model has a nested folder for `wisconsin-BCa-model` lol
         # still, we need to specify exactly this path, or we will have inconsistencies 
         # between local and remote
         return Model(path='.azure-tmp/wisconsin-BCa-model/wisconsin-BCa-model')
 
-    model = mlclient.models.get(name=MODEL_NAME, version=str(latest_model_version))
+    model = mlclient.models.get(name=constants.MODEL_NAME, version=str(latest_model_version))
     print(f'Got model {model.name} with version {model.version}')
     return model
 
@@ -98,16 +106,19 @@ def ml_environment(mlclient: MLClient, local: bool) -> Environment:
     Reference: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-manage-environments-v2?view=azureml-api-2&tabs=python#create-an-environment-from-a-conda-specification
     '''
     # For local environments, assume the python file is being run in the root of the repo
-    env_name = 'local' if local else 'wisconsin-bca-env'
+    if not local:
+        latest_env_version = max(
+            [int(m.version) for m in mlclient.environments.list(constants.ENV_NAME)]
+        )
+
+        return mlclient.environments.get(name=constants.ENV_NAME, version=str(latest_env_version))
+
     env = Environment(
-        name=env_name,
+        name='local',
         conda_file='environment.yml',
         image='mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest'
     )
-    print(f'Environment made {env.name}')
-
-    if not local:
-        return mlclient.environments.create_or_update(env)
+    print(f'Local environment made:\n{env}')
 
     return env
 
@@ -117,14 +128,14 @@ def create_or_update_endpoint(mlclient: MLClient, local: bool) -> OnlineEndpoint
     creates endpoint if it doesn't exist, otherwise updates it
     '''
     try:
-        endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=local)
-        print(f'Endpoint {ENDPOINT_NAME} exists, reusing it')
+        endpoint = mlclient.online_endpoints.get(name=constants.ENDPOINT_NAME, local=local)
+        print(f'Endpoint {constants.ENDPOINT_NAME} exists, reusing it')
         return endpoint
     except Exception as _:
-        print(f'Endpoint {ENDPOINT_NAME} does not exist, creating it')
+        print(f'Endpoint {constants.ENDPOINT_NAME} does not exist, creating it')
         # define an online endpoint
         endpoint = ManagedOnlineEndpoint(
-            name=ENDPOINT_NAME,
+            name=constants.ENDPOINT_NAME,
             description='A managed online endpoint for the wisconsin breast cancer dataset',
             auth_mode="key"
         )
@@ -151,13 +162,15 @@ def create_or_update_deployment(
         local: bool
     ) -> str:
     '''
-    Creates model deployment if it doesn't exist, else updates it. Returns the deployment name to be used later on
+    Creates model deployment if it doesn't exist, else updates it. 
+    Returns the deployment name to be used later on
 
     If `local=True`, we use local docker deployments
 
     I kind of (?) use blue-green deployments here, but I'm not sure if it's the right way to do it
     https://docs.cloudfoundry.org/devguide/deploy-apps/blue-green.html
-    In theory, this should reduce downtime. If the deployment fails, the traffic is still routed to the old deployment.
+    In theory, this should reduce downtime. 
+    If the deployment fails, the traffic is still routed to the old deployment.
     '''
     if local:
         deployment_name, instance_type = 'local', "Standard_DS3_v2"
@@ -206,7 +219,7 @@ def post_deployment(mlclient: MLClient, deployment_name: str, local: bool):
     Running some checks and printing some metadata after the endpoint has been deployed
     '''
     # check deployment
-    endpoint = mlclient.online_endpoints.get(name=ENDPOINT_NAME, local=local)
+    endpoint = mlclient.online_endpoints.get(name=constants.ENDPOINT_NAME, local=local)
     # print endpoint metadata
     print(f'\n\n***ENDPOINT METADATA: {endpoint.name}***')
     print(f'Description: {endpoint.description}')
@@ -237,13 +250,14 @@ def post_deployment(mlclient: MLClient, deployment_name: str, local: bool):
 
 def _predict_at_endpoint(mlclient: MLClient, local: bool) -> bool:
     '''
-    Passing hardcoded data to the endpoint to test it out. Returns `true` if the prediction is expected, `false` if we need to retry
+    Passing hardcoded data to the endpoint to test it out. 
+    Returns `true` if the prediction is expected, `false` if we need to retry
     Retries happen when the endpoint is not ready to receive requests yet (502 Bad Gateway error)
-    
+
     Reference: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-online-endpoints?view=azureml-api-2&tabs=python#invoke-the-local-endpoint-to-score-data-by-using-your-model
     '''
     prediction = mlclient.online_endpoints.invoke(
-        endpoint_name=ENDPOINT_NAME,
+        endpoint_name=constants.ENDPOINT_NAME,
         request_file='tests/endpoint/sample_data.json',
         local=local
     )
@@ -251,7 +265,7 @@ def _predict_at_endpoint(mlclient: MLClient, local: bool) -> bool:
     if "502 Bad Gateway" in prediction:
          # What's weird is that the first few requests to the endpoint usually fail
         # with a 502 Bad Gateway error (at least on local deployments)
-        # I feel like there should be a way to check if the endpoint is ready to receive requests, 
+        # I feel like there should be a way to check if the endpoint is ready to receive requests,
         # but I couldn't find anything
         # In the endpoint metadata (post_deployment function), it always shows the state as "succeeded"
         print('Bad gateway error, retrying...')
@@ -267,7 +281,7 @@ def _predict_at_endpoint(mlclient: MLClient, local: bool) -> bool:
 def _print_logs(mlclient: MLClient, local: bool, deployment_name: str):
     logs = mlclient.online_deployments.get_logs(
         name=deployment_name,
-        endpoint_name=ENDPOINT_NAME,
+        endpoint_name=constants.ENDPOINT_NAME,
         local=local,
         lines=50
     )
