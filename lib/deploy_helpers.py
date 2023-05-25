@@ -30,12 +30,15 @@ def get_envs() -> tuple[str, str, str]:
     - `RESOURCE_GROUP`
     - `WORKSPACE_NAME`
     '''
-    envs = ["SUBSCRIPTION_ID", "RESOURCE_GROUP", "WORKSPACE_NAME" ]
 
-    for env in envs:
-        if os.environ.get(env) is None:
+    # type-safe function to get a single environment variable
+    def get_single_env(env: str) -> str:
+        e_val = os.environ.get(env)
+        if e_val is None:
             raise Exception(f"Environment variable {env} is not set.")
-    return os.environ.get("SUBSCRIPTION_ID"), os.environ.get("RESOURCE_GROUP"), os.environ.get("WORKSPACE_NAME")
+        return e_val
+
+    return get_single_env('SUBSCRIPTION_ID'), get_single_env('RESOURCE_GROUP'), get_single_env('WORKSPACE_NAME')
 
 
 def get_mlclient() -> MLClient:
