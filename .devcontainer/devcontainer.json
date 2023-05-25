@@ -20,7 +20,9 @@
 				"python.defaultInterpreterPath": "/opt/conda/envs/env",
 				// the `conda activate env` I add to `~/.bashrc` in `postcreate.sh` works better
 				// than the activateEnvironment here.
-				"python.terminal.activateEnvironment": false
+				"python.terminal.activateEnvironment": false,
+				// default pylint won't be able to resolve dependencies in our custom conda environment
+				"python.linting.pylintPath": "/opt/conda/envs/env/bin/pylint"
 			},
 			"extensions": [
 				"ms-toolsai.jupyter",
