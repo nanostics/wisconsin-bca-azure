@@ -29,7 +29,7 @@ jobs:
   prep_data:
     name: prep_data
     display_name: prep-data
-    code: ../../develop
+    code: . # folder that holds prep.py, relative to this file (i think)
     command: >-
       python prep.py 
       --raw_data ${{inputs.raw_data}} 
@@ -47,7 +47,7 @@ jobs:
   train_model:
     name: train_model
     display_name: train-model
-    code: ../../develop
+    code: .
     command: >-
       python train.py 
       --train_data ${{inputs.train_data}} 
@@ -61,7 +61,7 @@ jobs:
   evaluate_model:
     name: evaluate_model
     display_name: evaluate-model
-    code: ../../develop
+    code: .
     command: >-
       python evaluate.py 
       --model_name ${{inputs.model_name}} 
@@ -79,7 +79,7 @@ jobs:
   register_model:
     name: register_model
     display_name: register-model
-    code: ../../develop
+    code: .
     command: >-
       python register.py 
       --model_name ${{inputs.model_name}} 
