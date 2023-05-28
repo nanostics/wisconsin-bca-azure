@@ -4,33 +4,35 @@ description: Logs into Azure CLI and installs Conda environment
 
 inputs:
   creds:
-    description: 'Azure Credentials'
+    description: "Azure Credentials"
     required: true
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Install az ml extension
       run: az extension add -n ml -y
+      shell: bash
 
     # Install with azure key right now, should I switch to OIDC?
     - name: Azure login
       uses: azure/login@v1
       with:
         creds: ${{ inputs.creds }}
-    
+
     - name: Setup conda
       uses: s-weigand/setup-conda@v1
       with:
         update-conda: true
         python-version: 3.9
-    
+
     - name: Test Conda Installation
       run: |
         conda --version
         which python
         conda env list
-    
+      shell: bash
+
     # https://github.com/s-weigand/setup-conda/issues/3
     - name: Cache Conda Environment
       id: cache
@@ -50,3 +52,4 @@ runs:
       run: conda env update -n __setup_conda -f environment.yml --prune
       # https://dev.to/epassaro/caching-anaconda-environments-in-github-actions-5hde
       if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
