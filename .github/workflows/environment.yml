@@ -31,46 +31,10 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
       
-      - name: Install az ml extension
-        run: az extension add -n ml -y
-
-      - name: Azure login
-        uses: azure/login@v1
+      - name: Setup Azure and Conda
+        uses: ./.github/actions/setup-azure-conda
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set Workspace and RG Defaults
-        run: |
-          az configure --defaults workspace=${{ vars.AZURE_WORKSPACE_NAME }}
-          az configure --defaults group=${{ vars.AZURE_RESOURCE_GROUP }}
-
-      - name: Setup conda
-        uses: s-weigand/setup-conda@v1
-        with:
-          update-conda: true
-          python-version: 3.9
-
-      - name: Test Conda Installation
-        run: |
-          conda --version
-          which python
-          conda env list
-
-      # https://github.com/s-weigand/setup-conda/issues/3
-      - name: Cache Conda Environment
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.CONDA_PATH }}
-          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-conda-
-
-      - name: Install environment.yml
-        # https://stackoverflow.com/a/43873901
-        run: conda env update -n __setup_conda -f environment.yml --prune
-        # https://dev.to/epassaro/caching-anaconda-environments-in-github-actions-5hde
-        if: steps.cache.outputs.cache-hit != 'true'
 
       # version automatically updates, even if environment.yml doesn't change
       - name: Run Deploy
