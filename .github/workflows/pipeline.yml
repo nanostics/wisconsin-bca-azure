@@ -17,15 +17,15 @@ on:
 
 jobs:
   # this runs train-evaluate-register stuff on the Azure compute instances.
-  # basically, az ml job create --file azure/train/pipeline.yml
+  # basically, az ml job create --file azure/pipeline/pipeline.yml
   azure-pipeline:
-    name: Azure Pipeline
+    name: Run train/evaluate/register
     # https://github.com/Azure/mlops-templates/blob/main/.github/workflows/run-pipeline.yml
     uses: Azure/mlops-templates/.github/workflows/run-pipeline.yml@main
     with:
       workspace_name: ${{ vars.AZURE_WORKSPACE_NAME }}
       resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
-      parameters-file:  azure/train/pipeline.yml
+      parameters-file:  azure/pipeline/pipeline.yml
       job-name: test
     secrets:
       creds: ${{ secrets.AZURE_CREDENTIALS }}
