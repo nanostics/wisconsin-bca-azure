@@ -1,6 +1,6 @@
 # Azure Train
 
-This folder holds the files used in the main Azure ML Pipeline. 
+This folder holds the files used in the main Azure ML Pipeline (train-evaluate-register).
 
 ## Resources
 
