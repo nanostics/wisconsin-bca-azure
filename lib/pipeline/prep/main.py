@@ -12,12 +12,16 @@ import numpy as np
 import pandas as pd
 
 
+# https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-component-pipeline-python?view=azureml-api-2#define-component-using-python-function-1
 @command_component(
     name="prep_data",
     version="1",
     display_name="Prep Data",
     description="Prepares raw data and provides training, validation and test datasets",
-    environment="azureml:wisconsin-bca-env@latest"
+    environment={
+        'conda_file': f'{Path(__file__).parent}/conda.yaml',
+        'image': 'mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference',
+    }
 )
 def prepare_data_component(
     raw_data: Input(type="uri_file"),
