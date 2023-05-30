@@ -2,11 +2,11 @@
 # imports components from `lib/pipeline`
 
 # relative imports from lib/deploy_helpers.py
-import os 
+import os
 
 import deploy_helpers as helper
 import constants
-from pipeline.prep.main import prepare_data_component
+from lib.prep.main import prepare_data_component
 
 from azure.ai.ml import Input
 from azure.ai.ml.dsl import pipeline
@@ -14,7 +14,7 @@ from azure.ai.ml.constants import AssetTypes
 
 # define a pipeline
 @pipeline(
-    default_compute='cpu-cluster',
+    default_compute='cpu-cluster'
 )
 def wisconsin_bca_pipeline(input_data):
     '''
@@ -30,15 +30,15 @@ if __name__ == '__main__':
     print('Dataset:', wisconsin_bca_dataset)
     pipeline = wisconsin_bca_pipeline(input_data=wisconsin_bca_dataset)
 
-    # Log into Azure 
+    # Log into Azure
     ml_client = helper.get_mlclient()
     ml_client.compute.get(constants.CPU_CLUSTER_TARGET)
 
     print(f'PYTHONPATH env var: {os.environ.get("PYTHONPATH")}')
 
     # submit pipeline job!
-    pipeline_job = ml_client.jobs.create_or_update(
-        pipeline, experiment_name=constants.EXPERIMENT_NAME
-    )
+    # pipeline_job = ml_client.jobs.create_or_update(
+    #     pipeline, experiment_name=constants.EXPERIMENT_NAME
+    # )
 
-    ml_client.jobs.stream(pipeline_job.name)
+    # ml_client.jobs.stream(pipeline_job.name)

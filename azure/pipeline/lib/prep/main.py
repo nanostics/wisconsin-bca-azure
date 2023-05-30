@@ -7,7 +7,7 @@ See also: https://github.com/Azure/mlops-v2-gha-demo/blob/bd61f8c79c7c4cf4e30fe8
 from pathlib import Path
 from mldesigner import command_component, Input, Output
 import mlflow
-from  pipeline import constants
+from .. import constants
 import numpy as np
 import pandas as pd
 
