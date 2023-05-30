@@ -37,8 +37,8 @@ if __name__ == '__main__':
     print(f'PYTHONPATH env var: {os.environ.get("PYTHONPATH")}')
 
     # submit pipeline job!
-    # pipeline_job = ml_client.jobs.create_or_update(
-    #     pipeline, experiment_name=constants.EXPERIMENT_NAME
-    # )
+    pipeline_job = ml_client.jobs.create_or_update(
+        pipeline, experiment_name=constants.EXPERIMENT_NAME
+    )
 
-    # ml_client.jobs.stream(pipeline_job.name)
+    ml_client.jobs.stream(pipeline_job.name)
