@@ -6,7 +6,7 @@ import os
 
 import deploy_helpers as helper
 import constants
-from pipeline.prep import prepare_data_component
+from pipeline.prep.main import prepare_data_component
 
 from azure.ai.ml import Input
 from azure.ai.ml.dsl import pipeline
