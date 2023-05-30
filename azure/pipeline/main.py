@@ -4,6 +4,7 @@
 # relative imports from lib/deploy_helpers.py
 import deploy_helpers as helper
 
+import constants
 from pipeline.prep import prepare_data_component
 
 from azure.ai.ml import Input
@@ -22,10 +23,17 @@ def wisconsin_bca_pipeline(input_data):
 
 # ref: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-component-pipeline-python?view=azureml-api-2
 if __name__ == '__main__':
-    client = helper.get_mlclient()
-
-    help(prepare_data_component)
-    
     # create a pipeline
-    wisconsin_bca_dataset = Input(type='uri_file', path='azureml:wisconsin-bca-data@latest')
-    pipeline_job = wisconsin_bca_pipeline(input_data=wisconsin_bca_dataset)
+    wisconsin_bca_dataset = Input(path='azureml:wisconsin-bca-data:1')
+    pipeline = wisconsin_bca_pipeline(input_data=wisconsin_bca_dataset)
+
+    # Log into Azure 
+    ml_client = helper.get_mlclient()
+    ml_client.compute.get(constants.CPU_CLUSTER_TARGET)
+
+    # submit pipeline job!
+    pipeline_job = ml_client.jobs.create_or_update(
+        pipeline, experiment_name=constants.EXPERIMENT_NAME
+    )
+
+    ml_client.jobs.stream(pipeline_job.name)
