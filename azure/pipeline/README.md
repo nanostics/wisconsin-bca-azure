@@ -12,6 +12,7 @@ export RESOURCE_GROUP=jnji-rg
 export WORKSPACE_NAME=joshua_nanostics_ml
 
 PYTHONPATH="lib" python azure/pipeline/main.py
+```
 
 ## Resources
 
