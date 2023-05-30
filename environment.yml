@@ -17,3 +17,4 @@ dependencies:
       - azureml-inference-server-http # needed to run local endpoint i guess?
       - pylint # for development
       - azure-cli # used in Github Actions
+      - mldesigner==0.1.0b13 # lib/pipeline
