@@ -25,8 +25,8 @@ def train(train_data, model_output):
     y_train = train_data[constants.TARGET_COL]
     X_train = train_data[constants.NUMERIC_COLS + constants.CAT_NOM_COLS + constants.CAT_ORD_COLS]
 
-    # Train a Random Forest Regression Model with the training set
-    model = SVC()
+    # Train an SVC Model with the training set
+    model = SVC(kernel='poly')
 
     # log model hyperparameters
     mlflow.log_param("model", "SVC")
