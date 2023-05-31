@@ -11,5 +11,5 @@ dependencies:
       - numpy
       - pandas
       - mlflow[extras] # azure/pipeline
-      - azure-mlflow
+      - azureml-mlflow
       - mldesigner==0.1.0b13 # lib/pipeline
