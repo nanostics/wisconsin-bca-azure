@@ -5,21 +5,9 @@ Copies from lib/deploy_helpers.py, but I can't figure out how to run
 the pipline with linking the code to lib/
 '''
 import os
-import time
 import sys
 
-import constants
-
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import (
-    ManagedOnlineEndpoint,
-    OnlineEndpoint,
-    ManagedOnlineDeployment,
-    Model,
-    Environment,
-    CodeConfiguration
-)
-from azure.ai.ml.exceptions import LocalEndpointInFailedStateError
 from azure.identity import AzureCliCredential
 
 def get_envs() -> tuple[str, str, str]:

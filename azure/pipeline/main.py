@@ -5,7 +5,7 @@
 import os
 from pathlib import Path
 
-import deploy_helpers as helper
+import lib.helpers as helper
 import constants
 
 from lib.prep.component import prepare_data_component
