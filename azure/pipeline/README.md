@@ -11,7 +11,7 @@ export SUBSCRIPTION_ID=2676283c-665b-4d2f-bf73-2c380edf47d9
 export RESOURCE_GROUP=jnji-rg
 export WORKSPACE_NAME=joshua_nanostics_ml
 
-PYTHONPATH="lib" python azure/pipeline/main.py
+python azure/pipeline/main.py
 ```
 
 ## Resources

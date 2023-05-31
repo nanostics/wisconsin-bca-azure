@@ -3,33 +3,16 @@ Prepares raw data and provides training, validation and test datasets
 
 See also: https://github.com/Azure/mlops-v2-gha-demo/blob/bd61f8c79c7c4cf4e30fe83a88e2b0532996ef33/data-science/src/prep.py
 '''
-
 from pathlib import Path
-import mlflow
-from .. import constants
+
 import numpy as np
 import pandas as pd
-from mldesigner import command_component, Input, Output 
+import mlflow
+
+from .. import constants
 
 
-# https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-component-pipeline-python?view=azureml-api-2#define-component-using-python-function-1
-@command_component(
-    name="prep_data",
-    version="1",
-    display_name="Prep Data",
-    description="Prepares raw data and provides training, validation and test datasets",
-    environment={
-        'conda_file': f'{Path(__file__).parent}/lib/prep/conda.yaml',
-        'image': 'mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference',
-    },
-    code='..' # we need the entire lib/ folder
-)
-def prepare_data_component(
-    raw_data: Input(type="uri_file"),
-    train_data: Output(type="uri_folder"),
-    val_data: Output(type="uri_folder"),
-    test_data: Output(type="uri_folder")
-):
+def prep(raw_data, train_data, val_data, test_data):
     '''
     A code-version of what was in `pipeline.yml`
     '''

@@ -3,16 +3,42 @@
 
 # relative imports from lib/deploy_helpers.py
 import os
-from pathlib import Path
 
 import lib.helpers as helper
-import constants
-
-from lib.prep.component import prepare_data_component
+from lib import constants
+from lib.prep.main import prep
 
 from azure.ai.ml import Input
 from azure.ai.ml.dsl import pipeline
 from azure.ai.ml.constants import AssetTypes
+
+
+from mldesigner import command_component, Input as MLInput, Output as MLOutput
+from pathlib import Path
+
+# Components
+# https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-component-pipeline-python?view=azureml-api-2#define-component-using-python-function-1
+# Defining them here so Azure can access the `lib/` folder correctly
+@command_component(
+    name="prep_data",
+    version="1",
+    display_name="Prep Data",
+    description="Prepares raw data and provides training, validation and test datasets",
+    environment={
+        'conda_file': f'{Path(__file__).parent}/lib/prep/conda.yaml',
+        'image': 'mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference',
+    }
+)
+def prepare_data_component(
+    raw_data: MLInput(type="uri_file"),
+    train_data: MLOutput(type="uri_folder"),
+    val_data: MLOutput(type="uri_folder"),
+    test_data: MLOutput(type="uri_folder")
+):
+    # https://github.com/Azure/azureml-examples/blob/d0d04883ec32508bfff5d455156f86a82b1cdcb7/sdk/python/jobs/pipelines/2e_image_classification_keras_minist_convnet/train/train_component.py
+
+    prep(raw_data, train_data, val_data, test_data)
+
 
 # define a pipeline
 @pipeline(
