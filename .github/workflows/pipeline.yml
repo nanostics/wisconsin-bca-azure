@@ -1,4 +1,4 @@
-name: Train Evaluate Register
+name: Run Azure Pipeline
 
 
 on: 
