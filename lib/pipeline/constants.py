@@ -1,4 +1,6 @@
-# constants relating to the Wisconsin BCa dataset
+'''
+constants relating to the Wisconsin BCa dataset
+'''
 
 TARGET_COL = "diagnosis_01"
 

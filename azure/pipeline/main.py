@@ -4,12 +4,9 @@
 # relative imports from lib/deploy_helpers.py
 import os
 
-from mldesigner import command_component, Input as MLInput, Output as MLOutput
-from pathlib import Path
-
 import constants
 import deploy_helpers
-from pipeline_components import prepare_data_component, train_data_component
+import pipeline_components as components
 
 from azure.ai.ml import Input
 from azure.ai.ml.dsl import pipeline
@@ -23,8 +20,14 @@ def wisconsin_bca_pipeline(input_data):
     '''
     E2E ML pipeline using the Wisconsin BCa Dataset
     '''
-    prep_node = prepare_data_component(raw_data=input_data)
-    train_node = train_data_component(train_data=prep_node.outputs.train_data)
+    prep_node = components.prepare_data(raw_data=input_data)
+    train_node = components.train_data(train_data=prep_node.outputs.train_data)
+
+    evaluate_node = components.evaluate_model(
+        model_input=train_node.outputs.model_output,
+        test_data=prep_node.outputs.test_data
+    )
+
 
 
 # ref: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-component-pipeline-python?view=azureml-api-2

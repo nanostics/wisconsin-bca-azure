@@ -8,6 +8,7 @@ from mldesigner import command_component, Input, Output
 
 from pipeline.prep import prep
 from pipeline.train import train
+from pipeline.evaluate import evaluate
 
 # https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-component-pipeline-python?view=azureml-api-2#define-component-using-python-function-1
 # Defining them here so Azure can access the `lib/` folder correctly
@@ -21,7 +22,7 @@ from pipeline.train import train
     },
     code='.' # view the entire lib folder
 )
-def prepare_data_component(
+def prepare_data(
     raw_data: Input(type="uri_file"),
     train_data: Output(type="uri_folder"),
     val_data: Output(type="uri_folder"),
@@ -39,8 +40,24 @@ def prepare_data_component(
         'image': 'mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference',
     }
 )
-def train_data_component(
+def train_data(
     train_data: Input(type="uri_folder"),
     model_output: Output(type="uri_folder")
 ):
     train(train_data, model_output)
+
+@command_component(
+    name="evaluate",
+    display_name="Evaluate Model",
+    description='Read trained model and test dataset, evaluate model and save result',
+    environment={
+        'conda_file': f'{Path(__file__).parent}/pipeline/evaluate/conda.yaml',
+        'image': 'mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference',
+    }
+)
+def evaluate_model(
+    model_input: Input(type="uri_folder"),
+    test_data: Input(type="uri_folder"),
+    evaluation_output: Output(type="uri_folder")
+):
+    evaluate("wisconsin-BCa-model", model_input, test_data, evaluation_output)
