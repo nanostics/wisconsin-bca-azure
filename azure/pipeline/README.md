@@ -2,6 +2,8 @@
 
 This folder holds the files used in the main Azure ML Pipeline (train-evaluate-register).
 
+Note the actual code to prep/train/evaluate is in [`lib/pipeline`](../../lib/pipeline/README.md).
+
 ## Running
 
 Running `main.py` locally is good for debugging. Make sure you are logged into the Azure CLI. Remember that this will spin up a Compute instance on Azure!
