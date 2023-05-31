@@ -3,10 +3,12 @@
 
 # relative imports from lib/deploy_helpers.py
 import os
+from pathlib import Path
 
 import deploy_helpers as helper
 import constants
-from lib.prep.main import prepare_data_component
+
+from lib.prep.component import prepare_data_component
 
 from azure.ai.ml import Input
 from azure.ai.ml.dsl import pipeline
