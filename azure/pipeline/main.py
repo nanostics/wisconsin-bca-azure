@@ -14,20 +14,24 @@ from azure.ai.ml.constants import AssetTypes
 
 # define a pipeline
 @pipeline(
-    default_compute='cpu-cluster'
+    default_compute='cpu-cluster',
 )
 def wisconsin_bca_pipeline(input_data):
     '''
     E2E ML pipeline using the Wisconsin BCa Dataset
     '''
-    prep_node = components.prepare_data(raw_data=input_data)
-    train_node = components.train_data(train_data=prep_node.outputs.train_data)
+    prep_node = components.prep(raw_data=input_data)
+    train_node = components.train(train_data=prep_node.outputs.train_data)
 
-    evaluate_node = components.evaluate_model(
+    evaluate_node = components.evaluate(
         model_input=train_node.outputs.model_output,
         test_data=prep_node.outputs.test_data
     )
 
+    register_node = components.register(
+        model_path=train_node.outputs.model_output,
+        evaluation_output=evaluate_node.outputs.evaluation_output,
+    )
 
 
 # ref: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-component-pipeline-python?view=azureml-api-2

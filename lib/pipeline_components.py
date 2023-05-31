@@ -6,9 +6,7 @@ I put this here (outside the pipeline folder) to fix import errors
 from pathlib import Path
 from mldesigner import command_component, Input, Output
 
-from pipeline.prep import prep
-from pipeline.train import train
-from pipeline.evaluate import evaluate
+import pipeline
 
 # https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-component-pipeline-python?view=azureml-api-2#define-component-using-python-function-1
 # Defining them here so Azure can access the `lib/` folder correctly
@@ -22,13 +20,13 @@ from pipeline.evaluate import evaluate
     },
     code='.' # view the entire lib folder
 )
-def prepare_data(
+def prep(
     raw_data: Input(type="uri_file"),
     train_data: Output(type="uri_folder"),
     val_data: Output(type="uri_folder"),
     test_data: Output(type="uri_folder")
 ):
-    prep(raw_data, train_data, val_data, test_data)
+    pipeline.prep(raw_data, train_data, val_data, test_data)
 
 
 @command_component(
@@ -40,11 +38,12 @@ def prepare_data(
         'image': 'mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference',
     }
 )
-def train_data(
+def train(
     train_data: Input(type="uri_folder"),
     model_output: Output(type="uri_folder")
 ):
-    train(train_data, model_output)
+    pipeline.train(train_data, model_output)
+
 
 @command_component(
     name="evaluate",
@@ -55,9 +54,26 @@ def train_data(
         'image': 'mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference',
     }
 )
-def evaluate_model(
+def evaluate(
     model_input: Input(type="uri_folder"),
     test_data: Input(type="uri_folder"),
     evaluation_output: Output(type="uri_folder")
 ):
-    evaluate("wisconsin-BCa-model", model_input, test_data, evaluation_output)
+    pipeline.evaluate("wisconsin-BCa-model", model_input, test_data, evaluation_output)
+
+
+@command_component(
+    name="register",
+    display_name="Register Model",
+    description='Loads model, registers it if deply flag is True',
+    environment={
+        'conda_file': f'{Path(__file__).parent}/pipeline/register/conda.yaml',
+        'image': 'mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference',
+    }
+)
+def register(
+    model_path: Input(type="uri_folder"),
+    evaluation_output: Input(type="uri_folder"),
+    model_info_output_path: Output(type="uri_folder")
+):
+    pipeline.register("wisconsin-BCa-model", model_path, evaluation_output, model_info_output_path)
