@@ -12,7 +12,7 @@ import mlflow.sklearn
 from sklearn.svm import SVC
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
-from .. import constants
+from pipeline import constants
 
 
 def train(train_data, model_output):
