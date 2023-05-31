@@ -2,6 +2,10 @@
 Pipeline Components
 
 I put this here (outside the pipeline folder) to fix import errors
+
+Also note that the `code` argument in the `@command_component`
+must be a fodler containing this file! I can't put this file inside 
+`azure/pipeline`
 '''
 from pathlib import Path
 from mldesigner import command_component, Input, Output
