@@ -1,20 +1,20 @@
 '''
 Read trained model and test dataset, evaluate model and save result
 '''
-from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
-from .. import constants
 from pathlib import Path
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-
 import mlflow
 import mlflow.sklearn
 import mlflow.pyfunc
 from mlflow.tracking import MlflowClient
+
+from .. import constants
 
 
 def evaluate(model_name, model_input, test_data, evaluation_output, runner="CloudRunner"):

@@ -1,4 +1,4 @@
-name: pipeline-prep
+name: pipeline-train
 
 # this conda environment.yml file is just for us to train out model
 # it should be a subset of the conda environment we train and deploy with!
@@ -12,6 +12,6 @@ dependencies:
       - pandas
       - matplotlib
       - scikit-learn
-      - azureml-mlflow
       - mlflow[extras] # azure/pipeline
+      - azureml-mlflow
       - mldesigner==0.1.0b13 # lib/pipeline

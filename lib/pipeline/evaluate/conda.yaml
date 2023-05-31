@@ -1,4 +1,4 @@
-name: pipeline-prep
+name: pipeline-evaluate
 
 # this conda environment.yml file is just for us to prep the model
 # it should be a subset of the conda environment we train and deploy with!
@@ -11,4 +11,5 @@ dependencies:
       - numpy
       - pandas
       - mlflow[extras] # azure/pipeline
+      - azure-mlflow
       - mldesigner==0.1.0b13 # lib/pipeline
