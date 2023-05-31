@@ -12,8 +12,9 @@ dependencies:
       - scikit-learn==1.2.2
       - azureml-mlflow
       - azure-ai-ml # azure/
-      - mlflow[extras] # azure/train
+      - mlflow[extras] # azure/pipeline
       - inference-schema # azure/deploy/score.py
       - azureml-inference-server-http # needed to run local endpoint i guess?
       - pylint # for development
       - azure-cli # used in Github Actions
+      - mldesigner==0.1.0b13 # lib/pipeline
