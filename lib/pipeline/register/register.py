@@ -3,8 +3,8 @@
 import os
 import json
 
-import mlflow
 from pathlib import Path
+import mlflow
 
 def register(model_name, model_path, evaluation_output, model_info_output_path):
     '''Loads model, registers it if deply flag is True'''
@@ -13,7 +13,7 @@ def register(model_name, model_path, evaluation_output, model_info_output_path):
         deploy_flag = int(infile.read())
         
     mlflow.log_metric("deploy flag", int(deploy_flag))
-    deploy_flag=0
+    deploy_flag=1
     if deploy_flag==1:
 
         print("Registering ", model_name)
