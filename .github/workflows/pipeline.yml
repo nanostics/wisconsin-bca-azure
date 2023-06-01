@@ -7,12 +7,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - '!*.md'
-  # run on every pull request, but not those that only change markdown files
+  # run on every pull request
   pull_request:
-    paths:
-      - '!*.md'
 
 
 jobs:

@@ -18,6 +18,9 @@ from pipeline import constants
 def train(train_data, model_output):
     mlflow.start_run()
 
+    # automatically log necessary parameters
+    mlflow.sklearn.autolog()
+
     # Read train data
     train_data = pd.read_parquet(Path(train_data))
 
@@ -25,17 +28,12 @@ def train(train_data, model_output):
     y_train = train_data[constants.TARGET_COL]
     X_train = train_data[constants.NUMERIC_COLS + constants.CAT_NOM_COLS + constants.CAT_ORD_COLS]
 
-    # Train a Random Forest Regression Model with the training set
-    model = SVC()
+    # Train a SVC Model with the training set
+    model = SVC(kernel='poly')
 
     # log model hyperparameters
     mlflow.log_param("model", "SVC")
-    # mlflow.log_param("n_estimators", args.regressor__n_estimators)
-    # mlflow.log_param("bootstrap", args.regressor__bootstrap)
-    # mlflow.log_param("max_depth", args.regressor__max_depth)
-    # mlflow.log_param("max_features", args.regressor__max_features)
-    # mlflow.log_param("min_samples_leaf", args.regressor__min_samples_leaf)
-    # mlflow.log_param("min_samples_split", args.regressor__min_samples_split)
+    mlflow.log_param("kernel", model.kernel) # don't mind the type errors lol
 
     # Train model with the train set
     model.fit(X_train, y_train)
@@ -44,6 +42,7 @@ def train(train_data, model_output):
     yhat_train = model.predict(X_train)
 
     # Evaluate Regression performance with the train set
+    # do we still need this?
     r2 = r2_score(y_train, yhat_train)
     mse = mean_squared_error(y_train, yhat_train)
     rmse = np.sqrt(mse)
