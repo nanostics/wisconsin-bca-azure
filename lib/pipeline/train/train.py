@@ -18,6 +18,9 @@ from pipeline import constants
 def train(train_data, model_output):
     mlflow.start_run()
 
+    # automatically log necessary parameters
+    mlflow.autolog()
+
     # Read train data
     train_data = pd.read_parquet(Path(train_data))
 
@@ -28,15 +31,6 @@ def train(train_data, model_output):
     # Train a Random Forest Regression Model with the training set
     model = SVC(kernel='sigmoid')
 
-    # log model hyperparameters
-    mlflow.log_param("model", "SVC")
-    # mlflow.log_param("n_estimators", args.regressor__n_estimators)
-    # mlflow.log_param("bootstrap", args.regressor__bootstrap)
-    # mlflow.log_param("max_depth", args.regressor__max_depth)
-    # mlflow.log_param("max_features", args.regressor__max_features)
-    # mlflow.log_param("min_samples_leaf", args.regressor__min_samples_leaf)
-    # mlflow.log_param("min_samples_split", args.regressor__min_samples_split)
-
     # Train model with the train set
     model.fit(X_train, y_train)
 
@@ -44,6 +38,7 @@ def train(train_data, model_output):
     yhat_train = model.predict(X_train)
 
     # Evaluate Regression performance with the train set
+    # do we still need this?
     r2 = r2_score(y_train, yhat_train)
     mse = mean_squared_error(y_train, yhat_train)
     rmse = np.sqrt(mse)
