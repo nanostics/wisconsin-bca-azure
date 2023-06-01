@@ -29,7 +29,7 @@ def train(train_data, model_output):
     X_train = train_data[constants.NUMERIC_COLS + constants.CAT_NOM_COLS + constants.CAT_ORD_COLS]
 
     # Train a SVC Model with the training set
-    model = SVC(kernel='poly')
+    model = SVC(kernel='poly', C=2)
 
     # log model hyperparameters
     mlflow.log_param("model", "SVC")
