@@ -19,7 +19,7 @@ def train(train_data, model_output):
     mlflow.start_run()
 
     # automatically log necessary parameters
-    mlflow.autolog()
+    mlflow.sklearn.autolog()
 
     # Read train data
     train_data = pd.read_parquet(Path(train_data))
@@ -28,7 +28,7 @@ def train(train_data, model_output):
     y_train = train_data[constants.TARGET_COL]
     X_train = train_data[constants.NUMERIC_COLS + constants.CAT_NOM_COLS + constants.CAT_ORD_COLS]
 
-    # Train a Random Forest Regression Model with the training set
+    # Train a SVC Model with the training set
     model = SVC(kernel='poly')
 
     # Train model with the train set

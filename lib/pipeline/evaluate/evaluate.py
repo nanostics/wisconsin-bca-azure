@@ -21,7 +21,7 @@ def evaluate(model_name, model_input, test_data, evaluation_output, runner="Clou
     '''Read trained model and test dataset, evaluate model and save result'''
     mlflow.start_run()
 
-    mlflow.autolog()
+    mlflow.sklearn.autolog()
 
     # Load the test data
     test_data = pd.read_parquet(Path(test_data))
