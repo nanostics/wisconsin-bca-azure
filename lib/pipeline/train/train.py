@@ -31,6 +31,10 @@ def train(train_data, model_output):
     # Train a SVC Model with the training set
     model = SVC(kernel='poly')
 
+    # log model hyperparameters
+    mlflow.log_param("model", "SVC")
+    mlflow.log_param("kernel", model.kernel) # don't mind the type errors lol
+
     # Train model with the train set
     model.fit(X_train, y_train)
 
