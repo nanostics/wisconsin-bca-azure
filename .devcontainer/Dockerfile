@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/anaconda:0-3
+FROM mcr.microsoft.com/devcontainers/miniconda:0-3
 
 COPY environment.yml* .devcontainer/noop.txt /tmp/conda-tmp/
 # https://www.sckaiser.com/blog/2023/01/30/conda-codespaces.html

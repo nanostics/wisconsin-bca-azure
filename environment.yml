@@ -9,6 +9,8 @@ dependencies:
   - pip
   - pip:
       - numpy
+      - seaborn # data science stuff
+      - ipykernel # data science stuff
       - scikit-learn==1.2.2
       - azureml-mlflow
       - azure-ai-ml # azure/
