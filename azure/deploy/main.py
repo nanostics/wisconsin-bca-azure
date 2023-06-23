@@ -13,6 +13,15 @@ if __name__ == '__main__':
     model = helper.get_latest_model(client, local=False)
     environment = helper.ml_environment(client, local=False)
     endpoint = helper.create_or_update_endpoint(client, local=False)
-    deployment_name = helper.create_or_update_deployment(client, model, environment, endpoint, local=False)
+    curr_deployment_name = helper.create_or_update_deployment(client, model, environment, endpoint, local=False)
 
-    helper.post_deployment(client, deployment_name, local=False)
+    # If there is a 0% endpoint, DELETE IT!
+    traffic = endpoint.traffic
+    print(f'Traffic after deployment: {traffic}')
+    # since we will only be using blue and green deployments, we can just check these two
+    for deploy_name in ['blue', 'green']:
+        if deploy_name in traffic and traffic[deploy_name] == 0:
+            print(f'Begin deleting deployment {deploy_name}')
+            client.online_deployments.begin_delete(deploy_name, endpoint_name=endpoint.name)
+
+    helper.post_deployment(client, curr_deployment_name, local=False)
